@@ -404,7 +404,7 @@ expect(screen.getByText('conteúdo')).toBeInTheDocument()
 - Produz:
   - `NAV_ITEMS: { to: string; label: string; icon: LucideIcon }[]` = `/` Visão geral (`LayoutDashboard`), `/ativos` Ativos (`Boxes`), `/alertas` Alertas (`TriangleAlert`), `/eventos` Eventos (`Activity`)
   - `Sidebar()`, `MobileNav()`, `AppShell()`. O `AppShell` renderiza a Sidebar (`md+`), um slot de header (preenchido na Tarefa 7) e o `<Outlet/>` dentro de `<main id="conteudo">`.
-  - `routes: RouteObject[]` e `AppRoutes()` (= `useRoutes(routes)`), ambos em `src/App.tsx`. O `App` envolve `AppRoutes` com `BrowserRouter` e os providers. Os testes renderizam `<AppRoutes />` com `renderWithProviders`.
+  - `AppRoutes()` (= `useRoutes(routes)`) em `src/App.tsx`; `routes` fica interno ao arquivo. `NAV_ITEMS` fica em `src/components/layout/nav-items.ts`, e o componente `NavLinks`, usado pela sidebar e pelo menu mobile, em `nav.tsx`. O `App` envolve `AppRoutes` com `BrowserRouter` e os providers. Os testes renderizam `<AppRoutes />` com `renderWithProviders`.
 
 - [ ] **Passo 1: Escrever os testes que falham**
 
