@@ -33,6 +33,15 @@ describe('createMockData', () => {
     expect(d.kpis.map((k) => k.id)).toEqual(['assetsOnline', 'openIncidents', 'avgLatency', 'ingestRate'])
   })
 
+  it('alertas de períodos diferentes têm ids diferentes', () => {
+    const ids = PERIODS.flatMap((p) => createMockData(p).alerts.map((a) => a.id))
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  it('a frota de ativos é a mesma em todos os períodos', () => {
+    expect(createMockData('7d').assets).toEqual(createMockData('24h').assets)
+  })
+
   it('é gerado no instante de referência', () => {
     expect(createMockData('24h').generatedAt).toBe(REFERENCE_NOW)
   })

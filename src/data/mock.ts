@@ -135,14 +135,15 @@ function withinPeriod(rng: Rng, now: number, durationMs: number): number {
   return now - Math.round(between(rng, 0.002, 0.99) * durationMs)
 }
 
-function createAlerts(rng: Rng, now: number, durationMs: number, assets: Asset[]): Alert[] {
+// Ids incluem o período: o mesmo número em 24h e 7d seria outro alerta, e reconhecer um não pode marcar o outro.
+function createAlerts(rng: Rng, period: Period, now: number, durationMs: number, assets: Asset[]): Alert[] {
   const troubled = assets.filter((a) => a.status !== 'online')
   // Em parte das sementes todos os críticos já foram tratados e o sistema fica operacional.
   const criticalsHandled = rng() < 0.35
 
   return shuffle(rng, ALERT_SEVERITIES)
     .map((severity, i) => ({
-      id: `AL-${pad(i + 1, 4)}`,
+      id: `AL-${period.toUpperCase()}-${pad(i + 1, 4)}`,
       title: pick(rng, ALERT_TITLES[severity]),
       severity,
       assetId: (severity === 'critical' ? pick(rng, troubled) : pick(rng, assets)).id,
@@ -214,7 +215,7 @@ export function createMockData(period: Period, seed = 42): DashboardData {
   const rng = mulberry32(seed * 31 + salt)
 
   const throughput = createThroughput(rng, now, durationMs, points)
-  const alerts = createAlerts(rng, now, durationMs, assets)
+  const alerts = createAlerts(rng, period, now, durationMs, assets)
   const events = createEvents(rng, now, durationMs, assets)
   const pendingCritical = alerts.some((a) => a.severity === 'critical' && !a.acknowledged)
 
