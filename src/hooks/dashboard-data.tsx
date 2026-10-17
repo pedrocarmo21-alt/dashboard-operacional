@@ -17,8 +17,6 @@ export interface DashboardDataState {
 
 const DashboardDataContext = createContext<DashboardDataState | null>(null)
 
-const defaultFetcher: Fetcher = (period, signal) =>
-  fetchDashboard(period, signal, getSimulationMode(window.location.search))
 
 // Novo valor de um KPI mantendo a mesma base de comparação: o valor do período anterior
 // é recuperado de value / (1 + delta/100) e a variação é recalculada contra ele.
@@ -43,9 +41,17 @@ function applyAcknowledged(data: DashboardData, acknowledged: ReadonlySet<string
 }
 
 /** Busca os dados do período escolhido nos filtros. `fetcher` precisa ter identidade estável. */
-export function DashboardDataProvider({ children, fetcher = defaultFetcher }: { children: ReactNode; fetcher?: Fetcher }) {
+export function DashboardDataProvider({ children, fetcher }: { children: ReactNode; fetcher?: Fetcher }) {
   const { period } = useFilters()
-  const load = useCallback((signal: AbortSignal) => fetcher(period, signal), [fetcher, period])
+  // O modo ?simular= é lido uma vez: os links internos não levam a query string, e a
+  // simulação precisa continuar valendo depois de navegar.
+  const [simulated] = useState<Fetcher>(() => {
+    const mode = getSimulationMode(window.location.search)
+    const simulatedFetcher: Fetcher = (p, signal) => fetchDashboard(p, signal, mode)
+    return simulatedFetcher
+  })
+  const activeFetcher = fetcher ?? simulated
+  const load = useCallback((signal: AbortSignal) => activeFetcher(period, signal), [activeFetcher, period])
   const { status, data, error, retry } = useAsync(load)
 
   const [acknowledged, setAcknowledged] = useState<ReadonlySet<string>>(() => new Set())

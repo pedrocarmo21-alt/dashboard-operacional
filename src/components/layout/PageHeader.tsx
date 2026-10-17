@@ -8,7 +8,10 @@ export function PageHeader({ title, children }: { title: string; children?: Reac
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <h1 className="text-lg font-medium">{title}</h1>
+      {/* tabIndex -1: recebe o foco na troca de página (ver AppShell). */}
+      <h1 tabIndex={-1} className="text-lg font-medium outline-none">
+        {title}
+      </h1>
       {children}
     </div>
   )

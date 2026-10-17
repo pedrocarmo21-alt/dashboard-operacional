@@ -68,6 +68,19 @@ describe('rotas', () => {
   })
 })
 
+describe('foco na troca de página', () => {
+  it('navegar leva o foco ao título da nova página, para o leitor de tela anunciá-la', async () => {
+    const { user } = renderWithProviders(<AppRoutes />)
+    await user.click(screen.getByRole('link', { name: 'Alertas' }))
+    expect(screen.getByRole('heading', { level: 1, name: 'Alertas' })).toHaveFocus()
+  })
+
+  it('a primeira carga não move o foco', () => {
+    renderWithProviders(<AppRoutes />)
+    expect(screen.getByRole('heading', { level: 1, name: 'Visão geral' })).not.toHaveFocus()
+  })
+})
+
 describe('erro inesperado numa página', () => {
   it('fica dentro do shell: a navegação continua e trocar de rota limpa o erro', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})

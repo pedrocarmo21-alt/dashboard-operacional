@@ -135,6 +135,16 @@ describe('useDashboardData', () => {
     expect(result.current.dash.error?.message).toBe('Falha ao carregar dados')
   })
 
+  it('o modo ?simular= vale para a sessão, mesmo depois de navegar para um endereço sem ele', async () => {
+    window.history.replaceState(null, '', '/?simular=erro')
+    const { result } = setup()
+    await waitFor(() => expect(result.current.dash.status).toBe('error'), { timeout: 2000 })
+    window.history.replaceState(null, '', '/alertas')
+    act(() => result.current.dash.retry())
+    await waitFor(() => expect(result.current.dash.status).toBe('error'), { timeout: 2000 })
+    expect(result.current.dash.error?.message).toBe('Falha ao carregar dados')
+  })
+
   it('fora do provider lança erro explicativo', () => {
     expect(() => renderHook(() => useDashboardData())).toThrow(
       'useDashboardData precisa estar dentro de <DashboardDataProvider>',

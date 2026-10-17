@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { Outlet, useLocation } from 'react-router'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Toaster } from '@/components/ui/sonner'
@@ -7,6 +8,17 @@ import { Sidebar } from './Sidebar'
 /** Estrutura de todas as páginas: link de pular, sidebar, header, conteúdo e notificações toast. */
 export function AppShell() {
   const { pathname } = useLocation()
+
+  // Numa SPA o leitor de tela não percebe a troca de página: ao navegar, o foco vai para o
+  // título da nova página, que é lido. Compara com a rota anterior (e não com uma marca de
+  // "primeira vez"), porque o StrictMode roda o efeito duas vezes na montagem.
+  const previousPath = useRef(pathname)
+  useEffect(() => {
+    if (previousPath.current === pathname) return
+    previousPath.current = pathname
+    document.querySelector<HTMLElement>('#conteudo h1')?.focus()
+  }, [pathname])
+
   return (
     <div className="flex min-h-svh">
       <a

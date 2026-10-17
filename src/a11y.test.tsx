@@ -23,7 +23,9 @@ describe('acessibilidade (axe)', () => {
       await screen.findByRole('figure', { name: 'Alertas por severidade' }, LAZY_CHART)
     }
     expect(await axe(container, AXE_OPTIONS)).toHaveNoViolations()
-  })
+    // O mais pesado da suíte (dados, import do Recharts, gráficos e axe na página inteira):
+    // sob carga da máquina chegou a passar dos 15 s padrão.
+  }, 30_000)
 
   it('carregando, sem violações', async () => {
     const { container } = renderWithProviders(<AppRoutes />, { fetcher: () => new Promise(() => {}) })

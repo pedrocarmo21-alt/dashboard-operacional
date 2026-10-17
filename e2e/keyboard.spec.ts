@@ -51,3 +51,9 @@ test('"/" foca a busca de qualquer lugar da página', async ({ page }) => {
   await page.keyboard.press('/')
   await expect(page.getByRole('searchbox', { name: 'Buscar ativos, alertas e eventos' })).toBeFocused()
 })
+
+test('navegar pelo teclado leva o foco ao título da nova página', async ({ page }) => {
+  await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Eventos' }).focus()
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('heading', { level: 1, name: 'Eventos' })).toBeFocused()
+})
