@@ -108,6 +108,14 @@ describe('OverviewPage', () => {
     expect(Number(kpiValue('Incidentes abertos'))).toBe(before - 1)
   })
 
+  it('reconhecer no painel resumido mantém o foco dentro do painel', async () => {
+    const { user } = renderWithProviders(<OverviewPage />)
+    await screen.findByText('Latência média')
+    await user.click(within(region('Alertas')).getAllByRole('button', { name: /^Reconhecer alerta/ })[0])
+    expect(document.activeElement).not.toBe(document.body)
+    expect(region('Alertas')).toContainElement(document.activeElement as HTMLElement)
+  })
+
   it('a busca do header filtra a tabela da visão geral', async () => {
     const { user } = renderWithProviders(<AppRoutes />)
     await screen.findByText('Latência média')

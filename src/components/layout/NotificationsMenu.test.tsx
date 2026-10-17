@@ -85,6 +85,22 @@ describe('NotificationsMenu', () => {
     expect(screen.getByRole('button', { name: 'Notificações, 2 não lidas' })).toBeInTheDocument()
   })
 
+  it('depois de reconhecer, o foco vai para o próximo alerta, com o menu aberto', async () => {
+    const { user } = setup([alert(1), alert(2)])
+    await user.click(await screen.findByRole('button', { name: 'Notificações, 2 não lidas' }))
+    await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 1 (AT-0001)' }))
+    expect(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 2 (AT-0001)' })).toHaveFocus()
+    expect(screen.getByRole('list', { name: 'Alertas pendentes' })).toBeInTheDocument()
+  })
+
+  it('reconhecendo o último, o foco vai para "Ver todos os alertas"', async () => {
+    const { user } = setup([alert(1)])
+    await user.click(await screen.findByRole('button', { name: 'Notificações, 1 não lida' }))
+    await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 1 (AT-0001)' }))
+    expect(screen.getByRole('link', { name: 'Ver todos os alertas' })).toHaveFocus()
+    expect(screen.getByText('Nenhuma notificação')).toBeInTheDocument()
+  })
+
   it('"Ver todos os alertas" navega para /alertas e fecha o menu', async () => {
     const { user } = setup([alert(1)])
     await user.click(await screen.findByRole('button', { name: /^Notificações, 1/ }))

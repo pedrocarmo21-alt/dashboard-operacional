@@ -1,5 +1,5 @@
 import { Bell } from 'lucide-react'
-import { useId, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -30,6 +30,24 @@ export function NotificationsMenu() {
   )
   const count = pending?.length
 
+  // O item reconhecido sai da lista: o foco vai para o próximo "Reconhecer" ou, se não
+  // sobrar nenhum, para "Ver todos os alertas", em vez de cair no <body> com o menu aberto.
+  const listRef = useRef<HTMLUListElement>(null)
+  const seeAllRef = useRef<HTMLAnchorElement>(null)
+  const focusIndex = useRef<number | null>(null)
+  useEffect(() => {
+    const index = focusIndex.current
+    if (index === null) return
+    focusIndex.current = null
+    const buttons = listRef.current?.querySelectorAll<HTMLElement>('button') ?? []
+    ;(buttons[Math.min(index, buttons.length - 1)] ?? seeAllRef.current)?.focus()
+  }, [pending])
+
+  const acknowledge = (id: string, index: number) => {
+    focusIndex.current = index
+    acknowledgeAlert(id)
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -58,13 +76,13 @@ export function NotificationsMenu() {
           ) : pending.length === 0 ? (
             <p className="px-3 py-4 text-sm text-muted-foreground">Nenhuma notificação</p>
           ) : (
-            <ul aria-label="Alertas pendentes" className="divide-y">
-              {pending.slice(0, VISIBLE).map((alert) => (
+            <ul ref={listRef} aria-label="Alertas pendentes" className="divide-y">
+              {pending.slice(0, VISIBLE).map((alert, index) => (
                 <NotificationItem
                   key={alert.id}
                   alert={alert}
                   now={new Date(data!.generatedAt)}
-                  onAcknowledge={acknowledgeAlert}
+                  onAcknowledge={(id) => acknowledge(id, index)}
                 />
               ))}
             </ul>
@@ -72,6 +90,7 @@ export function NotificationsMenu() {
         </div>
         <div className="border-t px-3 py-2">
           <Link
+            ref={seeAllRef}
             to="/alertas"
             onClick={() => setOpen(false)}
             className="text-xs text-signal-ok underline-offset-4 hover:underline"

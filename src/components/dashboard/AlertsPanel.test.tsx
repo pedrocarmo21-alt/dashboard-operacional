@@ -1,4 +1,5 @@
 import { screen, within } from '@testing-library/react'
+import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '@/test/render'
 import type { Alert, Severity } from '@/types/dashboard'
@@ -76,11 +77,35 @@ describe('AlertsPanel', () => {
     expect(onAcknowledge).toHaveBeenCalledWith('AL-3')
   })
 
-  it('depois de reconhecer, o foco vai para o item, não se perde', async () => {
-    const { user } = setup()
-    await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 3 (AT-0003)' }))
-    const item = items().find((li) => li.textContent?.includes('Alerta 3'))!
-    expect(item).toHaveFocus()
+  describe('foco depois de reconhecer (lista com estado real)', () => {
+    function Stateful({ limit }: { limit?: number }) {
+      const [list, setList] = useState(alerts)
+      return (
+        <AlertsPanel
+          alerts={list}
+          severity="all"
+          query=""
+          limit={limit}
+          now={NOW}
+          onAcknowledge={(id) => setList((l) => l.map((a) => (a.id === id ? { ...a, acknowledged: true } : a)))}
+        />
+      )
+    }
+
+    it('vai para o próximo alerta, que passa a ocupar a mesma posição', async () => {
+      const { user } = renderWithProviders(<Stateful />)
+      await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 3 (AT-0003)' }))
+      expect(document.activeElement).toBe(items()[1])
+      expect(items()[1]).toHaveTextContent('Alerta 4')
+    })
+
+    it('com limite, não se perde quando o item reconhecido sai dos visíveis', async () => {
+      const { user } = renderWithProviders(<Stateful limit={2} />)
+      await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 2 (AT-0002)' }))
+      expect(document.activeElement).not.toBe(document.body)
+      expect(document.activeElement).toBe(items()[0])
+      expect(items()[0]).toHaveTextContent('Alerta 3')
+    })
   })
 
   it('alerta reconhecido mostra "Reconhecido" e não tem botão', () => {

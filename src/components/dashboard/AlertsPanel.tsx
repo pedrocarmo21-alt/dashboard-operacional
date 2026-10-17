@@ -1,5 +1,5 @@
 import { Check } from 'lucide-react'
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { formatDateTime, formatRelativeTime } from '@/lib/format'
@@ -33,16 +33,33 @@ export function AlertsPanel({ alerts, severity, query, onAcknowledge, limit, now
         .sort(byPriority),
     [alerts, severity, query],
   )
-  const visible = limit === undefined ? rows : rows.slice(0, limit)
+  const visible = useMemo(() => (limit === undefined ? rows : rows.slice(0, limit)), [rows, limit])
+
+  // Reconhecer reordena a lista (e, com limite, pode tirar o item da tela). O foco vai para
+  // o item que passa a ocupar a mesma posição, em vez de cair no <body>.
+  const listRef = useRef<HTMLOListElement>(null)
+  const focusIndex = useRef<number | null>(null)
+  useEffect(() => {
+    const index = focusIndex.current
+    if (index === null) return
+    focusIndex.current = null
+    const items = listRef.current?.querySelectorAll<HTMLElement>(':scope > li') ?? []
+    ;(items[Math.min(index, items.length - 1)] ?? listRef.current)?.focus()
+  }, [visible])
+
+  const acknowledge = (id: string, index: number) => {
+    focusIndex.current = index
+    onAcknowledge(id)
+  }
 
   if (alerts.length === 0) return <p className="text-sm text-muted-foreground">Nenhum alerta no período.</p>
   if (rows.length === 0) return <p className="text-sm text-muted-foreground">Nenhum alerta para os filtros atuais.</p>
 
   return (
     <div className="flex flex-col gap-3">
-      <ol aria-label="Alertas" className="flex flex-col divide-y">
-        {visible.map((alert) => (
-          <AlertItem key={alert.id} alert={alert} now={now} onAcknowledge={onAcknowledge} />
+      <ol ref={listRef} tabIndex={-1} aria-label="Alertas" className="flex flex-col divide-y outline-none">
+        {visible.map((alert, index) => (
+          <AlertItem key={alert.id} alert={alert} now={now} onAcknowledge={(id) => acknowledge(id, index)} />
         ))}
       </ol>
       {limit !== undefined && rows.length > limit && (
@@ -55,11 +72,8 @@ export function AlertsPanel({ alerts, severity, query, onAcknowledge, limit, now
 }
 
 function AlertItem({ alert, now, onAcknowledge }: { alert: Alert; now: Date; onAcknowledge: (id: string) => void }) {
-  const itemRef = useRef<HTMLLIElement>(null)
-
   return (
     <li
-      ref={itemRef}
       tabIndex={-1}
       className="relative flex items-start gap-3 py-2.5 pl-3 outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-inset"
     >
@@ -87,11 +101,7 @@ function AlertItem({ alert, now, onAcknowledge }: { alert: Alert; now: Date; onA
           variant="outline"
           size="xs"
           aria-label={acknowledgeLabel(alert)}
-          // O botão some depois do clique; o foco fica no item em vez de cair no <body>.
-          onClick={() => {
-            onAcknowledge(alert.id)
-            itemRef.current?.focus()
-          }}
+          onClick={() => onAcknowledge(alert.id)}
         >
           Reconhecer
         </Button>
