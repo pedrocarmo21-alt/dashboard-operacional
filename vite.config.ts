@@ -16,6 +16,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     globals: false,
+    // Testes de integração (página inteira, axe, gráficos sob demanda) passam de 5 s sob carga.
+    testTimeout: 15_000,
     css: { include: [/src[\\/]index\.css(\?|$)/] },
   },
 })

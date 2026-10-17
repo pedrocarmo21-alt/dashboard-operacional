@@ -758,6 +758,8 @@ it('cada página tem um h1 com o nome da seção', ...)                     // p
 
 ### Tarefa 14: Acessibilidade e verificação final
 
+> **Execução (Tarefa 14):** o axe roda nas quatro páginas e na 404 com dados (e gráficos) carregados, nos estados de carregamento, erro e vazio, com a tabela de ingestão aberta e com os três menus abertos (sino, perfil e mobile, analisados no `<body>` por estarem em portais). `color-contrast` fica desligada no jsdom, que não calcula cores; o contraste é coberto por `theme.test.ts`. O axe encontrou e foram corrigidos: o popover do sino sem nome acessível e o menu do perfil com conteúdo que não é item de menu. `project.test.ts` verifica também a ausência de gradientes e de menções às marcas de referência. O Passo 3 (revisão visual) precisa de um navegador e não foi feito nesta sessão.
+
 **Arquivos:**
 - Teste: `src/a11y.test.tsx`
 - Modificar: o que o teste ou a revisão manual apontarem

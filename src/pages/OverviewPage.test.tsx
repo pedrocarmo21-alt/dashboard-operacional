@@ -5,6 +5,7 @@ import { createMockData } from '@/data/mock'
 import type { Fetcher } from '@/hooks/dashboard-data'
 import { controlledFetcher, emptyData, okFetcher } from '@/test/fetchers'
 import { renderWithProviders } from '@/test/render'
+import { LAZY_CHART } from '@/test/timeouts'
 import { OverviewPage } from './OverviewPage'
 
 const REGIONS = ['Indicadores', 'Ingestão de eventos', 'Alertas por severidade', 'Ativos', 'Alertas', 'Eventos']
@@ -74,13 +75,13 @@ describe('OverviewPage', () => {
     expect(within(region('Ativos')).getByRole('table')).toBeInTheDocument()
     expect(screen.queryAllByTestId('kpi-skeleton')).toHaveLength(0)
     // Os dados na tela ainda são de 24h: o rótulo não pode dizer 7 dias antes de eles chegarem.
-    expect(within(region('Ingestão de eventos')).getByRole('figure')).toHaveAccessibleName(
+    expect(await within(region('Ingestão de eventos')).findByRole('figure', {}, LAZY_CHART)).toHaveAccessibleName(
       'Ingestão de eventos por segundo, últimas 24 h',
     )
 
     await act(async () => calls.at(-1)!.resolve(createMockData('7d')))
     expect(region('Ativos')).not.toHaveAttribute('aria-busy')
-    expect(within(region('Ingestão de eventos')).getByRole('figure')).toHaveAccessibleName(
+    expect(await within(region('Ingestão de eventos')).findByRole('figure', {}, LAZY_CHART)).toHaveAccessibleName(
       'Ingestão de eventos por segundo, últimos 7 dias',
     )
   })

@@ -18,6 +18,31 @@ describe('projeto', () => {
     expect(offenders).toEqual([])
   })
 
+  // Restrições globais de docs/plano.md.
+  it('não usa gradientes', () => {
+    const sources = import.meta.glob<string>(['./**/*.{ts,tsx,css}', '!./**/*.test.{ts,tsx}'], {
+      query: '?raw',
+      import: 'default',
+      eager: true,
+    })
+    const offenders = Object.entries(sources)
+      .filter(([, source]) => /gradient/i.test(source))
+      .map(([file]) => file)
+    expect(offenders).toEqual([])
+  })
+
+  it('não menciona as marcas que inspiram o visual', () => {
+    const sources = import.meta.glob<string>(['./**/*.{ts,tsx,css}', '!./**/*.test.{ts,tsx}', '../index.html'], {
+      query: '?raw',
+      import: 'default',
+      eager: true,
+    })
+    const offenders = Object.entries(sources)
+      .filter(([, source]) => /palantir|anduril/i.test(source))
+      .map(([file]) => file)
+    expect(offenders).toEqual([])
+  })
+
   it('engines.node aceita a versão do .nvmrc', () => {
     expect(pkg.engines.node).toMatch(new RegExp(`^>=${nodeMajor}\\.\\d+$`))
   })
