@@ -80,7 +80,7 @@ describe('NotificationsMenu', () => {
   it('reconhecer tira o alerta da lista e atualiza o contador', async () => {
     const { user } = setup([alert(1), alert(2), alert(3)])
     await user.click(await screen.findByRole('button', { name: 'Notificações, 3 não lidas' }))
-    await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 1' }))
+    await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 1 (AT-0001)' }))
     expect(screen.queryByText('Alerta 1')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Notificações, 2 não lidas' })).toBeInTheDocument()
   })

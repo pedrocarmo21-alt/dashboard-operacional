@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useDashboardData } from '@/hooks/dashboard-data'
 import { formatRelativeTime } from '@/lib/format'
-import { SEVERITY_LABEL } from '@/lib/labels'
+import { acknowledgeLabel, SEVERITY_LABEL } from '@/lib/labels'
 import { SEVERITY_BG } from '@/lib/severity'
 import { cn } from '@/lib/utils'
 import type { Alert } from '@/types/dashboard'
@@ -108,7 +108,7 @@ function NotificationItem({
         type="button"
         variant="ghost"
         size="xs"
-        aria-label={`Reconhecer alerta ${alert.title}`}
+        aria-label={acknowledgeLabel(alert)}
         onClick={() => onAcknowledge(alert.id)}
       >
         Reconhecer

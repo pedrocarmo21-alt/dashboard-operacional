@@ -670,8 +670,8 @@ expect(screen.getByTestId('assets-scroll')).toHaveClass('overflow-x-auto')  // F
 **Interfaces:**
 - Consome: `Alert`, `ActivityEvent`, `Severity`, `SEVERITY_LABEL`, `matchesQuery`, `formatRelativeTime`, `formatDateTime`
 - Produz:
-  - `AlertsPanel({ alerts, severity, query, onAcknowledge, limit?, now? }: { alerts: Alert[]; severity: Severity | 'all'; query: string; onAcknowledge(id: string): void; limit?: number; now?: Date })`
-  - `ActivityFeed({ events, severity, query, limit?, now? }: { events: ActivityEvent[]; severity: Severity | 'all'; query: string; limit?: number; now?: Date })`
+  - `AlertsPanel({ alerts, severity, query, onAcknowledge, limit?, now }: { alerts: Alert[]; severity: Severity | 'all'; query: string; onAcknowledge(id: string): void; limit?: number; now: Date })`. O botão usa `acknowledgeLabel(alert)` = `Reconhecer alerta {título} ({ativo})`, também nas notificações do header, porque os títulos se repetem. Depois de reconhecer, o foco vai para o item. Vazio distingue "Nenhum alerta no período." de "Nenhum alerta para os filtros atuais."
+  - `ActivityFeed({ events, severity, query, limit?, now }: { events: ActivityEvent[]; severity: Severity | 'all'; query: string; limit?: number; now: Date })`. Ordena por conta própria (não depende da ordem do mock) e tem link "Ver todos os N eventos" com `limit`.
 
 - [ ] **Passo 1: Escrever os testes que falham**
 

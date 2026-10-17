@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { ASSET_STATUS_LABEL, ASSET_TYPE_LABEL, PERIOD_LABEL, SEVERITY_LABEL, SYSTEM_STATUS_LABEL } from './labels'
+import {
+  acknowledgeLabel,
+  ASSET_STATUS_LABEL,
+  ASSET_TYPE_LABEL,
+  PERIOD_LABEL,
+  SEVERITY_LABEL,
+  SYSTEM_STATUS_LABEL,
+} from './labels'
 
 // Rótulos fixados nas Restrições globais de docs/plano.md.
 describe('rótulos', () => {
@@ -25,5 +32,11 @@ describe('rótulos', () => {
 
   it('período', () => {
     expect(PERIOD_LABEL).toEqual({ '24h': 'Últimas 24 h', '7d': 'Últimos 7 dias', '30d': 'Últimos 30 dias' })
+  })
+
+  it('botão de reconhecer nomeia o alerta e o ativo', () => {
+    expect(acknowledgeLabel({ title: 'Falha de energia', assetId: 'AT-0007' })).toBe(
+      'Reconhecer alerta Falha de energia (AT-0007)',
+    )
   })
 })
