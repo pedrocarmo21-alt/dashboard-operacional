@@ -13,25 +13,25 @@ A especificação completa de design está em [`docs/design.md`](docs/design.md)
 - **Tailwind CSS** + **shadcn/ui** — estilos e componentes de interface
 - **Recharts** — gráficos
 - **Vitest** + **React Testing Library** — testes
-- **ESLint** — lint
+- **oxlint** — lint (padrão do template Vite atual)
 - **npm** — gerenciador de pacotes
 
 ## Comandos
 
-> O projeto ainda não foi inicializado. Estes são os scripts previstos para o `package.json`.
+> Use o Node do `.nvmrc` (`nvm use`) antes de rodar os comandos.
 
 ```bash
 npm install          # instalar dependências
 npm run dev          # servidor de desenvolvimento
 npm run build        # type-check + build de produção
 npm run preview      # servir o build localmente
-npm run lint         # ESLint
-npm run typecheck    # tsc --noEmit
+npm run lint         # oxlint
+npm run typecheck    # tsc -b --noEmit
 npm test             # Vitest em modo watch
 npm test -- --run    # Vitest uma vez (CI / verificação)
 ```
 
-Antes de considerar uma tarefa concluída, rode `npm run lint`, `npm run typecheck` e `npm test -- --run`.
+Antes de considerar uma tarefa concluída, rode `npm run lint`, `npm run typecheck`, `npm test -- --run` e `npm run build`.
 
 ## Estrutura de pastas
 
