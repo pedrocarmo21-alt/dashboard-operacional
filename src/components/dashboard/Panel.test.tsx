@@ -110,4 +110,25 @@ describe('Panel', () => {
     const [first, second] = screen.getAllByRole('region', { name: 'Ativos' })
     expect(first.getAttribute('aria-labelledby')).not.toBe(second.getAttribute('aria-labelledby'))
   })
+
+  it('recarregando mantém o conteúdo esmaecido e marca a região como ocupada', () => {
+    render(
+      <Panel title="Ativos" status="success" refreshing>
+        conteúdo
+      </Panel>,
+    )
+    expect(screen.getByText('conteúdo')).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Ativos' })).toHaveAttribute('aria-busy', 'true')
+    expect(screen.getByTestId('panel-body')).toHaveClass('opacity-50')
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  })
+
+  it('sem recarga, o conteúdo fica com opacidade normal', () => {
+    render(
+      <Panel title="Ativos" status="success">
+        conteúdo
+      </Panel>,
+    )
+    expect(screen.getByTestId('panel-body')).not.toHaveClass('opacity-50')
+  })
 })

@@ -52,6 +52,8 @@ export interface ActivityEvent {
 }
 
 export interface DashboardData {
+  /** Período a que os dados se referem (pode diferir do filtro enquanto uma recarga não termina). */
+  period: Period
   systemStatus: SystemStatus
   generatedAt: string
   kpis: Kpi[]

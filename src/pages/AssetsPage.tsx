@@ -1,3 +1,22 @@
+import { AssetsTable } from '@/components/dashboard/AssetsTable'
+import { Panel } from '@/components/dashboard/Panel'
+import { PageHeader } from '@/components/layout/PageHeader'
+import { useDashboardPanels } from '@/hooks/useDashboardPanels'
+import { useFilters } from '@/hooks/filters'
+
+// Sem barra de filtros: a frota é a mesma em qualquer período e ativos não têm severidade.
+// A busca do header e o filtro de status da tabela continuam valendo.
 export function AssetsPage() {
-  return <h1 className="text-lg font-medium">Ativos</h1>
+  const { query } = useFilters()
+  const { data, now, panel } = useDashboardPanels()
+  const assets = data?.assets ?? []
+
+  return (
+    <div className="flex flex-col gap-4">
+      <PageHeader title="Ativos" />
+      <Panel title="Todos os ativos" emptyMessage="Nenhum ativo no período." {...panel(assets.length)}>
+        <AssetsTable assets={assets} query={query} now={now} />
+      </Panel>
+    </div>
+  )
 }

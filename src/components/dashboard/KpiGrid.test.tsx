@@ -44,4 +44,11 @@ describe('KpiGrid', () => {
     await user.click(screen.getByRole('button', { name: 'Tentar novamente' }))
     expect(onRetry).toHaveBeenCalledOnce()
   })
+
+  it('recarregando mantém os KPIs esmaecidos, sem esqueleto', () => {
+    render(<KpiGrid kpis={kpis} status="success" refreshing />)
+    expect(screen.getAllByRole('term')).toHaveLength(4)
+    expect(screen.queryByTestId('kpi-skeleton')).not.toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Indicadores' })).toHaveAttribute('aria-busy', 'true')
+  })
 })

@@ -42,6 +42,10 @@ describe('createMockData', () => {
     expect(createMockData('7d').assets).toEqual(createMockData('24h').assets)
   })
 
+  it.each(PERIODS)('informa o próprio período (%s)', (period) => {
+    expect(createMockData(period).period).toBe(period)
+  })
+
   it('é gerado no instante de referência', () => {
     expect(createMockData('24h').generatedAt).toBe(REFERENCE_NOW)
   })

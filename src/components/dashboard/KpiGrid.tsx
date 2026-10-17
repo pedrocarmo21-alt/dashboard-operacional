@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
 import type { AsyncStatus, Kpi } from '@/types/dashboard'
 import { KpiCard } from './KpiCard'
 
@@ -8,13 +9,15 @@ const GRID = 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4'
 interface KpiGridProps {
   kpis: Kpi[]
   status: AsyncStatus
+  /** Recarregando com KPIs anteriores na tela: mostra-os esmaecidos. */
+  refreshing?: boolean
   onRetry?: () => void
 }
 
 /** Linha de KPIs com os mesmos estados de um painel: carregando, vazio e erro. */
-export function KpiGrid({ kpis, status, onRetry }: KpiGridProps) {
+export function KpiGrid({ kpis, status, refreshing = false, onRetry }: KpiGridProps) {
   return (
-    <section aria-label="Indicadores" aria-busy={status === 'loading' || undefined}>
+    <section aria-label="Indicadores" aria-busy={status === 'loading' || refreshing || undefined}>
       {status === 'loading' ? (
         <div role="status">
           <span className="sr-only">Carregando indicadores…</span>
@@ -40,7 +43,7 @@ export function KpiGrid({ kpis, status, onRetry }: KpiGridProps) {
       ) : status === 'empty' ? (
         <p className="rounded-lg border bg-card px-4 py-3 text-sm text-muted-foreground">Sem indicadores para o período.</p>
       ) : (
-        <div className={GRID}>
+        <div className={cn(GRID, 'transition-opacity', refreshing && 'opacity-50')}>
           {kpis.map((kpi) => (
             <KpiCard key={kpi.id} kpi={kpi} />
           ))}

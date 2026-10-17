@@ -10,6 +10,8 @@ interface PanelProps {
   /** Controles do cabeçalho; continuam visíveis em todos os estados. */
   actions?: ReactNode
   status: AsyncStatus
+  /** Recarregando com o conteúdo anterior na tela: mostra-o esmaecido em vez do esqueleto. */
+  refreshing?: boolean
   onRetry?: () => void
   emptyMessage?: string
   className?: string
@@ -22,6 +24,7 @@ export function Panel({
   description,
   actions,
   status,
+  refreshing = false,
   onRetry,
   emptyMessage = 'Nenhum dado para exibir.',
   className,
@@ -32,7 +35,7 @@ export function Panel({
   return (
     <section
       aria-labelledby={titleId}
-      aria-busy={status === 'loading' || undefined}
+      aria-busy={status === 'loading' || refreshing || undefined}
       className={cn('flex min-w-0 flex-col rounded-lg border bg-card text-card-foreground', className)}
     >
       <header className="flex items-start justify-between gap-3 border-b px-4 py-3">
@@ -44,7 +47,7 @@ export function Panel({
         </div>
         {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
       </header>
-      <div className="min-w-0 flex-1 p-4">
+      <div data-testid="panel-body" className={cn('min-w-0 flex-1 p-4 transition-opacity', refreshing && 'opacity-50')}>
         <PanelBody status={status} onRetry={onRetry} emptyMessage={emptyMessage}>
           {children}
         </PanelBody>

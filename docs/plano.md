@@ -749,6 +749,13 @@ it('cada página tem um h1 com o nome da seção', ...)                     // p
 
 ---
 
+> **Ajustes na execução (Tarefa 13):**
+> - `DashboardData` ganhou `period`: durante uma recarga, os dados na tela ainda são do período anterior, e os rótulos seguem os dados, não o filtro.
+> - `panelState(status, hasData, count)` em `lib/status.ts` e a prop `refreshing` em `Panel` e `KpiGrid`: ao recarregar com dados anteriores, o conteúdo fica esmaecido (`opacity-50`, `aria-busy`) em vez de voltar ao esqueleto. Erros aparecem sempre.
+> - `useDashboardPanels()` liga dados e painéis (`panel(n)`, `now`, `acknowledgeAlert`); `PageHeader` traz o `h1` e o título da aba (`{título} · Dashboard Operacional`).
+> - A página de Ativos não tem `FilterBar`: a frota não depende do período e ativos não têm severidade. Os painéis das páginas de seção se chamam "Todos os ativos/alertas/eventos".
+> - Os gráficos são carregados sob demanda (`components/charts/lazy.tsx`): com eles no pacote principal, o build passava de 500 kB e o Vite avisava.
+
 ### Tarefa 14: Acessibilidade e verificação final
 
 **Arquivos:**

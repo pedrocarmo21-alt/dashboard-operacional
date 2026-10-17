@@ -220,6 +220,7 @@ export function createMockData(period: Period, seed = 42): DashboardData {
   const pendingCritical = alerts.some((a) => a.severity === 'critical' && !a.acknowledged)
 
   return {
+    period,
     systemStatus: pendingCritical ? 'degraded' : 'operational',
     generatedAt: REFERENCE_NOW,
     kpis: createKpis(rng, assets, alerts, throughput),
