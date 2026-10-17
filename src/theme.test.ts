@@ -36,6 +36,12 @@ describe('tokens', () => {
     expect(declarations).toHaveLength(1)
   })
 
+  it('a linha de série única é neutra, não uma cor de status', () => {
+    const status = [vars['--signal-ok'], vars['--signal-warn'], vars['--signal-critical']]
+    expect(vars['--chart-line']).toBeDefined()
+    expect(status).not.toContain(vars['--chart-line'])
+  })
+
   it('expõe os sinais como cores do Tailwind', () => {
     expect(css).toMatch(/--color-signal-ok:\s*var\(--signal-ok\)/)
     expect(css).toMatch(/--color-signal-warn:\s*var\(--signal-warn\)/)
@@ -75,6 +81,7 @@ describe('contraste (WCAG)', () => {
     ['--chart-3', '--card', 3],
     ['--chart-4', '--card', 3],
     ['--chart-5', '--card', 3],
+    ['--chart-line', '--card', 3],
   ] as const)('%s sobre %s ≥ %d:1', (fg, bg, min) => {
     expect(contrast(vars[fg], vars[bg])).toBeGreaterThanOrEqual(min)
   })

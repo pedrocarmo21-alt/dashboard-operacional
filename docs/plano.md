@@ -606,6 +606,14 @@ await user.click(screen.getByRole('button', { name: 'Crítico: 2' }))
 
 ---
 
+> **Ajustes na execução (skill de dataviz):**
+> - A linha de ingestão usa `--chart-line: #d4d4d8`, neutro: o verde é cor de status ("ok") e não deve marcar uma série que não é status.
+> - Cada gráfico é uma `<figure aria-labelledby>` (não `role="img"`), com o SVG `aria-hidden` e sem a camada de foco do Recharts (`accessibilityLayer={false}`), para não haver foco escondido.
+> - Equivalente acessível: o gráfico de ingestão alterna para uma tabela com todos os pontos ("Ver como tabela"); no de severidade, os botões-filtro trazem rótulo e contagem.
+> - Barras de 20px com ponta arredondada de 4px e valor na ponta; ordem Crítico → Aviso → Info; a contagem inclui alertas já reconhecidos.
+> - Paleta validada com `validate_palette.js` sobre `--card`: separação para daltonismo ΔE 11,9 e contraste ≥ 3:1. As falhas de faixa de luminosidade e croma são regras de paletas categóricas, não se aplicam a status nem à série única neutra.
+
+
 ### Tarefa 11: Tabela de ativos
 
 **Arquivos:**
@@ -694,6 +702,8 @@ Listas `<ol>` densas. Cada item tem uma barra de 2px na cor da severidade, títu
 ---
 
 ### Tarefa 13: Montagem das páginas
+
+> **Nota para a execução:** o skill de dataviz pede que, ao recarregar (troca de período), gráficos e tabelas mantenham o conteúdo anterior com opacidade reduzida, sem voltar ao esqueleto. O `useAsync` já preserva `data` durante a carga; o `Panel` deve usar isso quando houver dados anteriores.
 
 **Arquivos:**
 - Modificar: `src/pages/OverviewPage.tsx`, `AssetsPage.tsx`, `AlertsPage.tsx`, `EventsPage.tsx`

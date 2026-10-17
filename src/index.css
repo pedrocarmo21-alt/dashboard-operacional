@@ -23,6 +23,7 @@
     --color-chart-4: var(--chart-4);
     --color-chart-3: var(--chart-3);
     --color-chart-2: var(--chart-2);
+    --color-chart-line: var(--chart-line);
     --color-chart-1: var(--chart-1);
     --color-ring: var(--ring);
     --color-input: var(--input);
@@ -80,6 +81,8 @@
     --chart-3: #ef4444;
     --chart-4: #8b8b94;
     --chart-5: #71717a;
+    /* Série única sem papel de status: neutra, para o verde continuar significando "ok". */
+    --chart-line: #d4d4d8;
     --radius: 0.25rem;
     --sidebar: #0a0a0b;
     --sidebar-foreground: #e4e4e7;
