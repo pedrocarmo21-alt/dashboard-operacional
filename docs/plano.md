@@ -220,12 +220,13 @@ Usar `Intl.NumberFormat('pt-BR')` (com `notation: 'compact'` no `formatCompact`)
 export type Period = '24h' | '7d' | '30d'
 export type Severity = 'info' | 'warning' | 'critical'
 export type AssetStatus = 'online' | 'degraded' | 'offline'
+export type AssetType = 'sensor' | 'veiculo' | 'estacao'
 export type SystemStatus = 'operational' | 'degraded' | 'outage'
 export type AsyncStatus = 'loading' | 'success' | 'empty' | 'error'
 export type KpiId = 'assetsOnline' | 'openIncidents' | 'avgLatency' | 'ingestRate'
 export interface Kpi { id: KpiId; label: string; value: number; unit: 'count' | 'ms' | 'eventsPerSec'; delta: number; goodWhen: 'up' | 'down' }
 export interface ThroughputPoint { timestamp: string; eventsPerSec: number }
-export interface Asset { id: string; name: string; type: 'sensor' | 'veiculo' | 'estacao'; region: string; status: AssetStatus; latencyMs: number; lastSeen: string }
+export interface Asset { id: string; name: string; type: AssetType; region: string; status: AssetStatus; latencyMs: number; lastSeen: string }
 export interface Alert { id: string; title: string; severity: Severity; assetId: string; createdAt: string; acknowledged: boolean }
 export interface ActivityEvent { id: string; message: string; actor: string; timestamp: string; severity: Severity }
 export interface DashboardData { systemStatus: SystemStatus; generatedAt: string; kpis: Kpi[]; throughput: ThroughputPoint[]; assets: Asset[]; alerts: Alert[]; events: ActivityEvent[] }
@@ -234,7 +235,7 @@ export interface DashboardData { systemStatus: SystemStatus; generatedAt: string
 - Produz também:
   - `SEVERITY_LABEL: Record<Severity, string>`, `ASSET_STATUS_LABEL`, `SYSTEM_STATUS_LABEL` e `PERIOD_LABEL: Record<Period, string>` (`'Últimas 24 h' | 'Últimos 7 dias' | 'Últimos 30 dias'`) em `labels.ts`
   - `REFERENCE_NOW = '2026-10-16T12:00:00Z'`
-  - `createMockData(period: Period, seed = 42): DashboardData` em `mock.ts`
+  - `createMockData(period: Period, seed = 42): DashboardData` em `mock.ts`. A frota de ativos é a mesma em todos os períodos; alertas e eventos vêm ordenados do mais recente para o mais antigo.
 
 - [ ] **Passo 1: Escrever os testes que falham**
 

@@ -1,0 +1,142 @@
+import { describe, expect, it } from 'vitest'
+import type { DashboardData, Kpi, KpiId, Period } from '@/types/dashboard'
+import { REFERENCE_NOW, createMockData } from './mock'
+
+const PERIODS: Period[] = ['24h', '7d', '30d']
+const HOUR = 3_600_000
+const PERIOD_MS: Record<Period, number> = { '24h': 24 * HOUR, '7d': 7 * 24 * HOUR, '30d': 30 * 24 * HOUR }
+const now = Date.parse(REFERENCE_NOW)
+
+const kpi = (d: DashboardData, id: KpiId): Kpi => d.kpis.find((k) => k.id === id)!
+
+describe('createMockData', () => {
+  it('é determinístico para a mesma semente', () => {
+    expect(createMockData('24h')).toEqual(createMockData('24h'))
+    expect(createMockData('7d', 7)).toEqual(createMockData('7d', 7))
+  })
+
+  it('sementes diferentes geram dados diferentes', () => {
+    expect(createMockData('24h', 1)).not.toEqual(createMockData('24h', 2))
+  })
+
+  it('gera a quantidade esperada de pontos por período', () => {
+    expect(createMockData('24h').throughput).toHaveLength(24)
+    expect(createMockData('7d').throughput).toHaveLength(28)
+    expect(createMockData('30d').throughput).toHaveLength(30)
+  })
+
+  it('gera 40 ativos, 12 alertas, 25 eventos e os 4 KPIs', () => {
+    const d = createMockData('24h')
+    expect(d.assets).toHaveLength(40)
+    expect(d.alerts).toHaveLength(12)
+    expect(d.events).toHaveLength(25)
+    expect(d.kpis.map((k) => k.id)).toEqual(['assetsOnline', 'openIncidents', 'avgLatency', 'ingestRate'])
+  })
+
+  it('é gerado no instante de referência', () => {
+    expect(createMockData('24h').generatedAt).toBe(REFERENCE_NOW)
+  })
+})
+
+describe.each(PERIODS)('consistência interna (%s)', (period) => {
+  const d = createMockData(period)
+  const start = now - PERIOD_MS[period]
+
+  it('a série termina no instante de referência, em ordem e com intervalo constante', () => {
+    const times = d.throughput.map((p) => Date.parse(p.timestamp))
+    expect(times.at(-1)).toBe(now)
+    const steps = new Set(times.slice(1).map((t, i) => t - times[i]))
+    expect(steps).toEqual(new Set([PERIOD_MS[period] / d.throughput.length]))
+  })
+
+  it('a ingestão é sempre positiva e finita', () => {
+    expect(d.throughput.every((p) => Number.isFinite(p.eventsPerSec) && p.eventsPerSec > 0)).toBe(true)
+  })
+
+  it('alertas e eventos caem dentro do período', () => {
+    const times = [...d.alerts.map((a) => a.createdAt), ...d.events.map((e) => e.timestamp)].map(Date.parse)
+    expect(times.every((t) => t > start && t <= now)).toBe(true)
+  })
+
+  it('ids são únicos', () => {
+    for (const list of [d.assets, d.alerts, d.events]) {
+      expect(new Set(list.map((x) => x.id)).size).toBe(list.length)
+    }
+  })
+
+  it('todo alerta aponta para um ativo existente', () => {
+    const ids = new Set(d.assets.map((a) => a.id))
+    expect(d.alerts.every((a) => ids.has(a.assetId))).toBe(true)
+  })
+
+  it('KPI de ativos online bate com a lista de ativos', () => {
+    expect(kpi(d, 'assetsOnline').value).toBe(d.assets.filter((a) => a.status === 'online').length)
+  })
+
+  it('KPI de incidentes abertos conta os alertas não reconhecidos', () => {
+    expect(kpi(d, 'openIncidents').value).toBe(d.alerts.filter((a) => !a.acknowledged).length)
+  })
+
+  it('KPI de latência média ignora ativos offline', () => {
+    const reachable = d.assets.filter((a) => a.status !== 'offline')
+    const mean = reachable.reduce((sum, a) => sum + a.latencyMs, 0) / reachable.length
+    expect(kpi(d, 'avgLatency').value).toBeCloseTo(mean, 6)
+  })
+
+  it('KPI de ingestão é o último ponto da série', () => {
+    expect(kpi(d, 'ingestRate').value).toBe(d.throughput.at(-1)!.eventsPerSec)
+  })
+
+  it('KPIs têm unidade, direção boa e variação finita', () => {
+    expect(d.kpis.map((k) => [k.id, k.unit, k.goodWhen])).toEqual([
+      ['assetsOnline', 'count', 'up'],
+      ['openIncidents', 'count', 'down'],
+      ['avgLatency', 'ms', 'down'],
+      ['ingestRate', 'eventsPerSec', 'up'],
+    ])
+    expect(d.kpis.every((k) => Number.isFinite(k.delta))).toBe(true)
+  })
+
+  it('status do sistema reflete alertas críticos pendentes', () => {
+    const pendingCritical = d.alerts.some((a) => a.severity === 'critical' && !a.acknowledged)
+    expect(d.systemStatus).toBe(pendingCritical ? 'degraded' : 'operational')
+  })
+
+  it('ativos têm latência positiva e foram vistos até o instante de referência', () => {
+    expect(d.assets.every((a) => Number.isFinite(a.latencyMs) && a.latencyMs > 0)).toBe(true)
+    expect(d.assets.every((a) => Date.parse(a.lastSeen) <= now)).toBe(true)
+  })
+
+  it('ativos online foram vistos há menos de 5 minutos; offline, há mais de 15', () => {
+    const age = (iso: string) => now - Date.parse(iso)
+    expect(d.assets.filter((a) => a.status === 'online').every((a) => age(a.lastSeen) < 5 * 60_000)).toBe(true)
+    expect(d.assets.filter((a) => a.status === 'offline').every((a) => age(a.lastSeen) > 15 * 60_000)).toBe(true)
+  })
+})
+
+describe('variedade dos dados', () => {
+  const d = createMockData('24h')
+
+  it('tem nomes com acento, para exercitar a busca', () => {
+    expect(d.assets.some((a) => /[ãçéó]/i.test(a.name))).toBe(true)
+  })
+
+  it('tem os três tipos e os três status de ativo', () => {
+    expect(new Set(d.assets.map((a) => a.type))).toEqual(new Set(['sensor', 'veiculo', 'estacao']))
+    expect(new Set(d.assets.map((a) => a.status))).toEqual(new Set(['online', 'degraded', 'offline']))
+  })
+
+  it('a maioria dos ativos está online', () => {
+    expect(d.assets.filter((a) => a.status === 'online').length).toBeGreaterThanOrEqual(28)
+  })
+
+  it('tem as três severidades nos alertas e alertas reconhecidos e pendentes', () => {
+    expect(new Set(d.alerts.map((a) => a.severity))).toEqual(new Set(['info', 'warning', 'critical']))
+    expect(new Set(d.alerts.map((a) => a.acknowledged))).toEqual(new Set([true, false]))
+  })
+
+  it('sementes diferentes produzem os dois status de sistema', () => {
+    const statuses = new Set(Array.from({ length: 30 }, (_, seed) => createMockData('24h', seed).systemStatus))
+    expect(statuses).toEqual(new Set(['operational', 'degraded']))
+  })
+})
