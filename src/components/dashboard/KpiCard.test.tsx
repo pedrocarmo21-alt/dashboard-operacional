@@ -5,7 +5,7 @@ import { KpiCard } from './KpiCard'
 
 const latency: Kpi = { id: 'avgLatency', label: 'Latência média', value: 128.4, unit: 'ms', delta: 12.3, goodWhen: 'down' }
 const online: Kpi = { id: 'assetsOnline', label: 'Ativos online', value: 31, unit: 'count', delta: 3, goodWhen: 'up' }
-const ingest: Kpi = { id: 'ingestRate', label: 'Taxa de ingestão', value: 1234.6, unit: 'eventsPerSec', delta: -4, goodWhen: 'up' }
+const ingest: Kpi = { id: 'ingestRate', label: 'Ingestão média', value: 1234.6, unit: 'eventsPerSec', delta: -4, goodWhen: 'up' }
 
 const norm = (s: string | null) => (s ?? '').replace(/\s/g, ' ')
 

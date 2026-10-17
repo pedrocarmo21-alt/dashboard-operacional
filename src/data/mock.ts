@@ -120,15 +120,24 @@ function createAssets(rng: Rng, now: number): Asset[] {
   })
 }
 
-function createThroughput(rng: Rng, now: number, durationMs: number, points: number): ThroughputPoint[] {
+/**
+ * Série de ingestão da janela de um período que termina em `endMs`. Tem sequência aleatória
+ * própria, derivada da janela: a mesma janela gera sempre a mesma série, o que permite
+ * calcular o período anterior para a variação do KPI.
+ */
+export function createThroughputSeries(period: Period, seed: number, endMs: number): ThroughputPoint[] {
+  const { durationMs, points, salt } = PERIODS[period]
+  const rng = mulberry32(seed * 131 + salt * 7 + Math.floor(endMs / durationMs))
   const step = durationMs / points
   return Array.from({ length: points }, (_, i) => {
-    const t = now - (points - 1 - i) * step
+    const t = endMs - (points - 1 - i) * step
     const hourOfDay = new Date(t).getUTCHours()
     const daily = 1 + 0.25 * Math.sin((2 * Math.PI * (hourOfDay - 6)) / 24)
     return { timestamp: iso(t), eventsPerSec: Math.round(1200 * daily + between(rng, -80, 80)) }
   })
 }
+
+const meanRate = (points: ThroughputPoint[]) => points.reduce((sum, p) => sum + p.eventsPerSec, 0) / points.length
 
 /** Instante aleatório dentro do período, nunca no início exato nem depois de `now`. */
 function withinPeriod(rng: Rng, now: number, durationMs: number): number {
@@ -168,10 +177,10 @@ function createEvents(rng: Rng, now: number, durationMs: number, assets: Asset[]
   }).sort((a, b) => b.timestamp.localeCompare(a.timestamp))
 }
 
-function createKpis(rng: Rng, assets: Asset[], alerts: Alert[], throughput: ThroughputPoint[]): Kpi[] {
+function createKpis(rng: Rng, assets: Asset[], alerts: Alert[], throughput: ThroughputPoint[], previous: ThroughputPoint[]): Kpi[] {
   const reachable = assets.filter((a) => a.status !== 'offline')
-  const first = throughput[0].eventsPerSec
-  const last = throughput[throughput.length - 1].eventsPerSec
+  const current = meanRate(throughput)
+  const before = meanRate(previous)
   return [
     {
       id: 'assetsOnline',
@@ -199,22 +208,23 @@ function createKpis(rng: Rng, assets: Asset[], alerts: Alert[], throughput: Thro
     },
     {
       id: 'ingestRate',
-      label: 'Taxa de ingestão',
-      value: last,
+      label: 'Ingestão média',
+      value: current,
       unit: 'eventsPerSec',
-      delta: round1(((last - first) / first) * 100),
+      delta: round1(((current - before) / before) * 100),
       goodWhen: 'up',
     },
   ]
 }
 
 export function createMockData(period: Period, seed = 42): DashboardData {
-  const { durationMs, points, salt } = PERIODS[period]
+  const { durationMs, salt } = PERIODS[period]
   const now = Date.parse(REFERENCE_NOW)
   const assets = createAssets(mulberry32(seed), now)
   const rng = mulberry32(seed * 31 + salt)
 
-  const throughput = createThroughput(rng, now, durationMs, points)
+  const throughput = createThroughputSeries(period, seed, now)
+  const previous = createThroughputSeries(period, seed, now - durationMs)
   const alerts = createAlerts(rng, period, now, durationMs, assets)
   const events = createEvents(rng, now, durationMs, assets)
   const pendingCritical = alerts.some((a) => a.severity === 'critical' && !a.acknowledged)
@@ -223,7 +233,7 @@ export function createMockData(period: Period, seed = 42): DashboardData {
     period,
     systemStatus: pendingCritical ? 'degraded' : 'operational',
     generatedAt: REFERENCE_NOW,
-    kpis: createKpis(rng, assets, alerts, throughput),
+    kpis: createKpis(rng, assets, alerts, throughput, previous),
     throughput,
     assets,
     alerts,

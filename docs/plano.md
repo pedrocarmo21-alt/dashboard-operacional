@@ -270,7 +270,7 @@ it('mantém consistência interna', () => {
 
 - [ ] **Passo 3: Implementar**
 
-PRNG `mulberry32(seed)` local em `mock.ts`, com todos os timestamps relativos a `REFERENCE_NOW`. Intervalo dos pontos: 1 h (24h), 6 h (7d) e 1 dia (30d). Nomes realistas como `Estação Norte-03`, `Sensor Óptico 12` e `Veículo Patrulha 07`. Regiões: Norte, Sul, Leste, Oeste, Centro. Distribuição aproximada dos status: 80% online, 15% degradado, 5% offline. `pendingAlerts` = alertas não reconhecidos. `systemStatus` = `'degraded'` se houver alerta crítico não reconhecido; senão `'operational'`.
+PRNG `mulberry32(seed)` local em `mock.ts`, com todos os timestamps relativos a `REFERENCE_NOW`. Intervalo dos pontos: 1 h (24h), 6 h (7d) e 1 dia (30d). Nomes realistas como `Estação Norte-03`, `Sensor Óptico 12` e `Veículo Patrulha 07`. Regiões: Norte, Sul, Leste, Oeste, Centro. Distribuição aproximada dos status: 80% online, 15% degradado, 5% offline. `pendingAlerts` = alertas não reconhecidos. `ingestRate` = média da série do período; a variação compara com a média do período anterior (`createThroughputSeries` com a janela imediatamente antes). `systemStatus` = `'degraded'` se houver alerta crítico não reconhecido; senão `'operational'`.
 
 - [ ] **Passo 4: Rodar e ver passar** — `npm test -- --run src/data` → PASS
 

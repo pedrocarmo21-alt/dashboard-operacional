@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { DashboardData, Kpi, KpiId, Period } from '@/types/dashboard'
-import { REFERENCE_NOW, createMockData } from './mock'
+import { REFERENCE_NOW, createMockData, createThroughputSeries } from './mock'
 
 const PERIODS: Period[] = ['24h', '7d', '30d']
 const HOUR = 3_600_000
@@ -8,6 +8,7 @@ const PERIOD_MS: Record<Period, number> = { '24h': 24 * HOUR, '7d': 7 * 24 * HOU
 const now = Date.parse(REFERENCE_NOW)
 
 const kpi = (d: DashboardData, id: KpiId): Kpi => d.kpis.find((k) => k.id === id)!
+const mean = (points: { eventsPerSec: number }[]) => points.reduce((sum, p) => sum + p.eventsPerSec, 0) / points.length
 
 describe('createMockData', () => {
   it('é determinístico para a mesma semente', () => {
@@ -96,8 +97,15 @@ describe.each(PERIODS)('consistência interna (%s)', (period) => {
     expect(kpi(d, 'avgLatency').value).toBeCloseTo(mean, 6)
   })
 
-  it('KPI de ingestão é o último ponto da série', () => {
-    expect(kpi(d, 'ingestRate').value).toBe(d.throughput.at(-1)!.eventsPerSec)
+  it('KPI de ingestão é a média da série do período', () => {
+    expect(kpi(d, 'ingestRate').label).toBe('Ingestão média')
+    expect(kpi(d, 'ingestRate').value).toBeCloseTo(mean(d.throughput), 6)
+  })
+
+  it('a variação da ingestão compara com a média do período anterior', () => {
+    const previous = createThroughputSeries(period, 42, now - PERIOD_MS[period])
+    const expected = Math.round(((mean(d.throughput) - mean(previous)) / mean(previous)) * 1000) / 10
+    expect(kpi(d, 'ingestRate').delta).toBe(expected)
   })
 
   it('KPIs têm unidade, direção boa e variação finita', () => {
@@ -124,6 +132,18 @@ describe.each(PERIODS)('consistência interna (%s)', (period) => {
     const age = (iso: string) => now - Date.parse(iso)
     expect(d.assets.filter((a) => a.status === 'online').every((a) => age(a.lastSeen) < 5 * 60_000)).toBe(true)
     expect(d.assets.filter((a) => a.status === 'offline').every((a) => age(a.lastSeen) > 15 * 60_000)).toBe(true)
+  })
+})
+
+describe('createThroughputSeries', () => {
+  it('a série do período anterior termina onde a atual começa', () => {
+    const current = createThroughputSeries('24h', 42, now)
+    const previous = createThroughputSeries('24h', 42, now - PERIOD_MS['24h'])
+    expect(Date.parse(previous.at(-1)!.timestamp)).toBe(Date.parse(current[0].timestamp) - PERIOD_MS['24h'] / 24)
+  })
+
+  it('é a mesma série que createMockData usa', () => {
+    expect(createThroughputSeries('7d', 42, now)).toEqual(createMockData('7d').throughput)
   })
 })
 

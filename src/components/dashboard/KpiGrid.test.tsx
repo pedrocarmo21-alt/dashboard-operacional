@@ -13,7 +13,7 @@ describe('KpiGrid', () => {
       'Ativos online',
       'Alertas pendentes',
       'Latência média',
-      'Taxa de ingestão',
+      'Ingestão média',
     ])
   })
 
