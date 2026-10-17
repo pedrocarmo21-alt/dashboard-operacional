@@ -96,7 +96,8 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    /* Contorno de foco sólido, sem transparência (Restrições globais). */
+    @apply border-border outline-ring;
   }
   body {
     @apply bg-background text-foreground antialiased;

@@ -46,7 +46,8 @@ export function ThroughputChart({ data, period }: ThroughputChartProps) {
                 axisLine={{ stroke: 'var(--border)' }}
                 minTickGap={32}
               />
-              <YAxis width={44} tickFormatter={formatCompact} tick={AXIS_TICK} tickLine={false} axisLine={false} />
+              {/* Largura para "1,6 mil" em fonte mono 11px; com 44px o "1," era cortado. */}
+              <YAxis width={60} tickFormatter={formatCompact} tick={AXIS_TICK} tickLine={false} axisLine={false} />
               <Tooltip
                 content={(props) => <ThroughputTooltip {...props} />}
                 cursor={{ stroke: 'var(--muted-foreground)', strokeWidth: 1 }}

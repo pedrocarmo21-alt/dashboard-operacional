@@ -9,7 +9,7 @@ export function AppShell() {
     <div className="flex min-h-svh">
       <a
         href="#conteudo"
-        className="sr-only rounded-sm bg-popover px-3 py-2 text-sm focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:ring-1 focus:ring-ring"
+        className="sr-only rounded-sm bg-popover px-3 py-2 text-sm focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:ring-1 focus:ring-ring focus:outline-none"
       >
         Pular para o conteúdo
       </a>

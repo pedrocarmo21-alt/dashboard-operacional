@@ -56,7 +56,8 @@ export function AssetsTable({ assets, query, limit, now }: AssetsTableProps) {
         aria-label="Status"
         value={status}
         onValueChange={(value) => value && setStatus(value as AssetStatus | 'all')}
-        className="self-start"
+        // Quebra linha em telas estreitas: em 360px os quatro filtros não cabem numa linha só.
+        className="flex-wrap self-start"
       >
         {STATUS_FILTERS.map((s) => (
           <ToggleGroupItem key={s} value={s} aria-label={`${statusFilterLabel(s)}: ${counts[s]}`} className="gap-1.5 px-2.5 text-xs">
