@@ -118,4 +118,29 @@ describe('AssetsTable', () => {
     setup()
     expect(within(bodyRows()[0]).getByText('Offline')).toBeInTheDocument()
   })
+
+  describe('status na URL', () => {
+    it('o link "Ver todos" leva o status escolhido', async () => {
+      const { user } = setup({ limit: 3 })
+      await user.click(screen.getByRole('radio', { name: /^Degradado/ }))
+      expect(screen.getByRole('link', { name: 'Ver todos os 6 ativos' })).toHaveAttribute('href', '/ativos?status=degraded')
+    })
+
+    it('sem status escolhido, o link não leva parâmetro', () => {
+      setup({ limit: 3 })
+      expect(screen.getByRole('link', { name: 'Ver todos os 40 ativos' })).toHaveAttribute('href', '/ativos')
+    })
+
+    it('abre com o status da URL', () => {
+      renderWithProviders(<AssetsTable assets={assets} query="" now={NOW} />, { route: '/ativos?status=offline' })
+      expect(screen.getByRole('radio', { name: /^Offline/ })).toHaveAttribute('aria-checked', 'true')
+      expect(bodyRows()).toHaveLength(2)
+    })
+
+    it('status inválido na URL vale como "Todos"', () => {
+      renderWithProviders(<AssetsTable assets={assets} query="" now={NOW} />, { route: '/ativos?status=xyz' })
+      expect(screen.getByRole('radio', { name: /^Todos/ })).toHaveAttribute('aria-checked', 'true')
+      expect(bodyRows()).toHaveLength(40)
+    })
+  })
 })

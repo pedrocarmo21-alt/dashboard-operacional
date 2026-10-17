@@ -1,6 +1,6 @@
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { type AssetSortKey, filterAssets, type SortDirection, sortAssets } from '@/lib/assets'
@@ -11,6 +11,8 @@ import type { Asset, AssetStatus } from '@/types/dashboard'
 
 const STATUS_FILTERS: (AssetStatus | 'all')[] = ['all', 'online', 'degraded', 'offline']
 const statusFilterLabel = (s: AssetStatus | 'all') => (s === 'all' ? 'Todos' : ASSET_STATUS_LABEL[s])
+const parseStatus = (value: string | null): AssetStatus | 'all' =>
+  STATUS_FILTERS.find((s) => s === value) ?? 'all'
 
 const STATUS_DOT: Record<AssetStatus, string> = {
   online: 'bg-signal-ok',
@@ -28,7 +30,19 @@ interface AssetsTableProps {
 }
 
 export function AssetsTable({ assets, query, limit, now }: AssetsTableProps) {
-  const [status, setStatus] = useState<AssetStatus | 'all'>('all')
+  // O status fica na URL (?status=): o link "Ver todos" leva o filtro para /ativos.
+  const [params, setParams] = useSearchParams()
+  const status = parseStatus(params.get('status'))
+  const setStatus = (next: AssetStatus | 'all') =>
+    setParams(
+      (prev) => {
+        const updated = new URLSearchParams(prev)
+        if (next === 'all') updated.delete('status')
+        else updated.set('status', next)
+        return updated
+      },
+      { replace: true },
+    )
   const [sort, setSort] = useState<{ key: AssetSortKey; dir: SortDirection }>({ key: 'status', dir: 'asc' })
 
   const counts = useMemo(() => {
@@ -109,7 +123,10 @@ export function AssetsTable({ assets, query, limit, now }: AssetsTableProps) {
       )}
 
       {limit !== undefined && rows.length > limit && (
-        <Link to="/ativos" className="self-start text-xs text-signal-ok underline-offset-4 hover:underline">
+        <Link
+          to={status === 'all' ? '/ativos' : `/ativos?status=${status}`}
+          className="self-start text-xs text-signal-ok underline-offset-4 hover:underline"
+        >
           Ver todos os {rows.length} ativos
         </Link>
       )}

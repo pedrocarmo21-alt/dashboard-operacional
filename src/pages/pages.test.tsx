@@ -30,6 +30,19 @@ describe('página de ativos', () => {
   })
 })
 
+describe('da visão geral para ativos', () => {
+  it('o status escolhido na amostra continua valendo na página completa', async () => {
+    const { user } = renderWithProviders(<AppRoutes />)
+    const overview = await screen.findByRole('region', { name: 'Ativos' })
+    // A amostra mostra 8: com "Online" (32) o link aparece.
+    await user.click(within(overview).getByRole('radio', { name: /^Online/ }))
+    await user.click(within(overview).getByRole('link', { name: 'Ver todos os 32 ativos' }))
+    const table = await screen.findByRole('table', { name: 'Ativos' })
+    expect(within(table).getAllByRole('row')).toHaveLength(33)
+    expect(screen.getByRole('radio', { name: /^Online/ })).toHaveAttribute('aria-checked', 'true')
+  })
+})
+
 describe('página de alertas', () => {
   it('mostra todos os alertas e a barra de filtros', async () => {
     renderWithProviders(<AppRoutes />, { route: '/alertas' })
