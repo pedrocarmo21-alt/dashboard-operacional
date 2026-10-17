@@ -73,7 +73,7 @@ describe('AlertsPanel', () => {
 
   it('reconhecer chama onAcknowledge com o id do alerta', async () => {
     const { user, onAcknowledge } = setup()
-    await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 3 (AT-0003)' }))
+    await user.click(screen.getByRole('button', { name: /^Reconhecer alerta Alerta 3 \(AT-0003,/ }))
     expect(onAcknowledge).toHaveBeenCalledWith('AL-3')
   })
 
@@ -94,14 +94,14 @@ describe('AlertsPanel', () => {
 
     it('vai para o próximo alerta, que passa a ocupar a mesma posição', async () => {
       const { user } = renderWithProviders(<Stateful />)
-      await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 3 (AT-0003)' }))
+      await user.click(screen.getByRole('button', { name: /^Reconhecer alerta Alerta 3 \(AT-0003,/ }))
       expect(document.activeElement).toBe(items()[1])
       expect(items()[1]).toHaveTextContent('Alerta 4')
     })
 
     it('com limite, não se perde quando o item reconhecido sai dos visíveis', async () => {
       const { user } = renderWithProviders(<Stateful limit={2} />)
-      await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 2 (AT-0002)' }))
+      await user.click(screen.getByRole('button', { name: /^Reconhecer alerta Alerta 2 \(AT-0002,/ }))
       expect(document.activeElement).not.toBe(document.body)
       expect(document.activeElement).toBe(items()[0])
       expect(items()[0]).toHaveTextContent('Alerta 3')
@@ -115,8 +115,13 @@ describe('AlertsPanel', () => {
     expect(within(done).queryByRole('button')).not.toBeInTheDocument()
   })
 
-  it('nomes dos botões são únicos mesmo com títulos repetidos', () => {
-    setup({ alerts: [alert(1, 'warning', { title: 'Igual' }), alert(2, 'warning', { title: 'Igual' })] })
+  it('nomes dos botões são únicos mesmo com título e ativo repetidos', () => {
+    setup({
+      alerts: [
+        alert(1, 'warning', { title: 'Igual', assetId: 'AT-0009' }),
+        alert(2, 'warning', { title: 'Igual', assetId: 'AT-0009' }),
+      ],
+    })
     const names = screen.getAllByRole('button', { name: /^Reconhecer/ }).map((b) => b.getAttribute('aria-label'))
     expect(new Set(names).size).toBe(2)
   })

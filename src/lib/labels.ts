@@ -1,3 +1,4 @@
+import { formatDateTime } from './format'
 import type { Alert, AssetStatus, AssetType, Period, Severity, SystemStatus } from '@/types/dashboard'
 
 export const SEVERITY_LABEL: Record<Severity, string> = {
@@ -30,7 +31,10 @@ export const PERIOD_LABEL: Record<Period, string> = {
   '30d': 'Últimos 30 dias',
 }
 
-/** Nome acessível do botão de reconhecer: título e ativo, para ser único na lista. */
-export function acknowledgeLabel({ title, assetId }: Pick<Alert, 'title' | 'assetId'>): string {
-  return `Reconhecer alerta ${title} (${assetId})`
+/**
+ * Nome acessível do botão de reconhecer: título, ativo e horário. Título e ativo sozinhos
+ * podem repetir (dois alertas iguais no mesmo ativo); com o horário, o nome é único na lista.
+ */
+export function acknowledgeLabel({ title, assetId, createdAt }: Pick<Alert, 'title' | 'assetId' | 'createdAt'>): string {
+  return `Reconhecer alerta ${title} (${assetId}, ${formatDateTime(createdAt)})`
 }

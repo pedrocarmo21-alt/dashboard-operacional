@@ -80,7 +80,7 @@ describe('NotificationsMenu', () => {
   it('reconhecer tira o alerta da lista e atualiza o contador', async () => {
     const { user } = setup([alert(1), alert(2), alert(3)])
     await user.click(await screen.findByRole('button', { name: 'Notificações, 3 pendentes' }))
-    await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 1 (AT-0001)' }))
+    await user.click(screen.getByRole('button', { name: /^Reconhecer alerta Alerta 1 \(AT-0001,/ }))
     expect(screen.queryByText('Alerta 1')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Notificações, 2 pendentes' })).toBeInTheDocument()
   })
@@ -88,15 +88,15 @@ describe('NotificationsMenu', () => {
   it('depois de reconhecer, o foco vai para o próximo alerta, com o menu aberto', async () => {
     const { user } = setup([alert(1), alert(2)])
     await user.click(await screen.findByRole('button', { name: 'Notificações, 2 pendentes' }))
-    await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 1 (AT-0001)' }))
-    expect(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 2 (AT-0001)' })).toHaveFocus()
+    await user.click(screen.getByRole('button', { name: /^Reconhecer alerta Alerta 1 \(AT-0001,/ }))
+    expect(screen.getByRole('button', { name: /^Reconhecer alerta Alerta 2 \(AT-0001,/ })).toHaveFocus()
     expect(screen.getByRole('list', { name: 'Alertas pendentes' })).toBeInTheDocument()
   })
 
   it('reconhecendo o último, o foco vai para "Ver todos os alertas"', async () => {
     const { user } = setup([alert(1)])
     await user.click(await screen.findByRole('button', { name: 'Notificações, 1 pendente' }))
-    await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 1 (AT-0001)' }))
+    await user.click(screen.getByRole('button', { name: /^Reconhecer alerta Alerta 1 \(AT-0001,/ }))
     expect(screen.getByRole('link', { name: 'Ver todos os alertas' })).toHaveFocus()
     expect(screen.getByText('Nenhuma notificação')).toBeInTheDocument()
   })
