@@ -37,6 +37,20 @@ describe('FilterBar', () => {
     expect(screen.getByRole('radio', { name: 'Últimos 7 dias' })).toHaveAttribute('aria-checked', 'false')
   })
 
+  it('o texto visível de cada período faz parte do nome falado (controle por voz)', () => {
+    setup()
+    for (const radio of screen.getAllByRole('radio')) {
+      const visible = radio.textContent!.trim()
+      expect(visible.length).toBeGreaterThan(0)
+      expect(radio.getAttribute('aria-label') ?? radio.textContent).toContain(visible)
+    }
+  })
+
+  it('a severidade tem rótulo visível', () => {
+    setup()
+    expect(screen.getByRole('combobox', { name: 'Severidade' })).toHaveTextContent(/^Severidade:/)
+  })
+
   it('os períodos formam um grupo nomeado', () => {
     setup()
     expect(screen.getByRole('radiogroup', { name: 'Período' })).toBeInTheDocument()

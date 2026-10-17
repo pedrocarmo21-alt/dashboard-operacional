@@ -7,6 +7,8 @@ import { PERIOD_LABEL, SEVERITY_LABEL } from '@/lib/labels'
 import type { Period, Severity } from '@/types/dashboard'
 
 const PERIODS: Period[] = ['24h', '7d', '30d']
+// O texto visível precisa estar contido no nome falado ("Últimos 7 dias"), para controle por voz.
+const PERIOD_SHORT: Record<Period, string> = { '24h': '24 h', '7d': '7 dias', '30d': '30 dias' }
 const SEVERITIES: (Severity | 'all')[] = ['all', 'info', 'warning', 'critical']
 const severityLabel = (s: Severity | 'all') => (s === 'all' ? 'Todas' : SEVERITY_LABEL[s])
 
@@ -26,8 +28,8 @@ export function FilterBar({ showSeverity = true }: { showSeverity?: boolean }) {
         onValueChange={(value) => value && setPeriod(value as Period)}
       >
         {PERIODS.map((p) => (
-          <ToggleGroupItem key={p} value={p} aria-label={PERIOD_LABEL[p]} className="px-2.5 font-mono text-xs">
-            {p}
+          <ToggleGroupItem key={p} value={p} aria-label={PERIOD_LABEL[p]} className="px-2.5 text-xs">
+            {PERIOD_SHORT[p]}
           </ToggleGroupItem>
         ))}
       </ToggleGroup>
@@ -35,6 +37,7 @@ export function FilterBar({ showSeverity = true }: { showSeverity?: boolean }) {
       {showSeverity && (
         <Select value={severity} onValueChange={(value) => setSeverity(value as Severity | 'all')}>
           <SelectTrigger size="sm" aria-label="Severidade" className="min-w-32 text-xs">
+            <span className="text-muted-foreground">Severidade:</span>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

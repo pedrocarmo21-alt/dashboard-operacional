@@ -23,11 +23,19 @@ describe('ProfileMenu', () => {
     expect(screen.getByRole('menu')).toHaveTextContent('Turno A')
   })
 
-  it('lista os atalhos de teclado', async () => {
+  it('"Atalhos de teclado" é um item alcançável e mostra a lista', async () => {
     const { user } = setup()
     await user.click(screen.getByRole('button', { name: 'Menu do perfil' }))
-    expect(screen.getByRole('menu')).toHaveTextContent('Focar a busca')
-    expect(screen.getByRole('menu')).toHaveTextContent('/')
+    const item = screen.getByRole('menuitem', { name: 'Atalhos de teclado' })
+    expect(item).not.toHaveAttribute('aria-disabled')
+    await user.click(item)
+    expect(await screen.findByText('/ foca a busca · Esc limpa a busca e fecha menus')).toBeInTheDocument()
+  })
+
+  it('todos os itens do menu são alcançáveis (nenhum desabilitado)', async () => {
+    const { user } = setup()
+    await user.click(screen.getByRole('button', { name: 'Menu do perfil' }))
+    for (const item of screen.getAllByRole('menuitem')) expect(item).not.toHaveAttribute('aria-disabled')
   })
 
   it('"Sair" avisa que a autenticação é de demonstração', async () => {

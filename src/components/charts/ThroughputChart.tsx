@@ -68,7 +68,13 @@ export function ThroughputChart({ data, period }: ThroughputChartProps) {
           </ResponsiveContainer>
         </div>
       ) : (
-        <div className="max-h-56 overflow-y-auto">
+        // Área com rolagem: precisa receber foco para ser rolada pelo teclado.
+        <div
+          role="region"
+          aria-label={caption}
+          tabIndex={0}
+          className="max-h-56 overflow-y-auto rounded-sm outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
           <table className="w-full text-sm">
             <caption className="sr-only">{caption}</caption>
             <thead className="sticky top-0 bg-card text-xs text-muted-foreground">

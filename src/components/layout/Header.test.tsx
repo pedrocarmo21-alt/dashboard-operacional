@@ -47,6 +47,13 @@ describe('Header', () => {
     expect(search()).toHaveValue('a/b')
   })
 
+  it('a dica "/" some enquanto há texto, para não ficar sob o "×" do campo', async () => {
+    const { user } = setup()
+    expect(screen.getByText('/', { selector: 'kbd' })).toBeInTheDocument()
+    await user.type(search(), 'x')
+    expect(screen.queryByText('/', { selector: 'kbd' })).not.toBeInTheDocument()
+  })
+
   it('Esc na busca limpa o texto', async () => {
     const { user } = setup()
     await user.type(search(), 'norte')

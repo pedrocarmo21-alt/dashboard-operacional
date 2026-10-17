@@ -33,7 +33,16 @@
     "jsx-a11y/role-has-required-aria-props": "error",
     "jsx-a11y/role-supports-aria-props": "error",
     "jsx-a11y/tabindex-no-positive": "error",
-    "jsx-a11y/prefer-tag-over-role": "off"
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "jsx-a11y/no-noninteractive-tabindex": [
+      "error",
+      {
+        "roles": [
+          "tabpanel",
+          "region"
+        ]
+      }
+    ]
   },
   "overrides": [
     {

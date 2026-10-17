@@ -1,22 +1,14 @@
-import { LogOut } from 'lucide-react'
+import { Keyboard, LogOut } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-
-const SHORTCUTS = [
-  ['Focar a busca', '/'],
-  ['Limpar a busca', 'Esc'],
-  ['Fechar menus', 'Esc'],
-]
 
 /** Perfil do operador. Sem autenticação real: "Sair" só avisa que é uma demonstração. */
 export function ProfileMenu() {
@@ -35,16 +27,15 @@ export function ProfileMenu() {
           <span className="font-mono text-xs font-normal text-muted-foreground">Turno A</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {/* Um menu só pode conter itens: os atalhos são itens desabilitados, com a tecla ao lado. */}
-        <DropdownMenuGroup>
-          <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Atalhos de teclado</DropdownMenuLabel>
-          {SHORTCUTS.map(([action, key]) => (
-            <DropdownMenuItem key={action} disabled className="text-xs data-disabled:opacity-100">
-              {action}
-              <DropdownMenuShortcut className="font-mono">{key}</DropdownMenuShortcut>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuGroup>
+        {/* Um item de verdade, alcançável pelas setas; a lista aparece num aviso. */}
+        <DropdownMenuItem
+          onSelect={() =>
+            toast('Atalhos de teclado', { description: '/ foca a busca · Esc limpa a busca e fecha menus' })
+          }
+        >
+          <Keyboard aria-hidden="true" />
+          Atalhos de teclado
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => toast('Demonstração: autenticação não configurada.')}>
           <LogOut aria-hidden="true" />

@@ -59,6 +59,15 @@ describe('ThroughputChart', () => {
     expect(screen.getByTestId('throughput-chart')).toBeInTheDocument()
   })
 
+  it('a tabela rola pelo teclado: a área de rolagem recebe foco e tem nome', async () => {
+    const user = userEvent.setup()
+    render(<ThroughputChart data={points} period="24h" />)
+    await user.click(screen.getByRole('button', { name: 'Ver como tabela' }))
+    const scroller = screen.getByRole('region', { name: 'Ingestão de eventos por segundo, últimas 24 h' })
+    expect(scroller).toHaveAttribute('tabindex', '0')
+    expect(scroller).toContainElement(screen.getByRole('table'))
+  })
+
   it('sem pontos, avisa em vez de desenhar', () => {
     render(<ThroughputChart data={[]} period="24h" />)
     expect(screen.getByText('Sem dados de ingestão no período.')).toBeInTheDocument()

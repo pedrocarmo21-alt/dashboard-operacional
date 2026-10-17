@@ -50,12 +50,15 @@ export function Header() {
           }}
           className="h-8 pr-8 pl-8"
         />
-        <kbd
-          aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 right-2 hidden -translate-y-1/2 rounded-sm border px-1 font-mono text-[11px] text-muted-foreground sm:block"
-        >
-          /
-        </kbd>
+        {/* Some com texto no campo: o "×" nativo do type="search" ocupa o mesmo lugar. */}
+        {!query && (
+          <kbd
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 right-2 hidden -translate-y-1/2 rounded-sm border px-1 font-mono text-[11px] text-muted-foreground sm:block"
+          >
+            /
+          </kbd>
+        )}
       </div>
       <div className="ml-auto flex items-center gap-1 md:gap-3">
         <SystemStatusBadge status={data?.systemStatus} unavailable={status === 'error' && !data} />
