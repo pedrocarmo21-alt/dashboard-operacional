@@ -1,6 +1,9 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { createMockData } from '@/data/mock'
+import type { Fetcher } from '@/hooks/dashboard-data'
 import { renderWithProviders } from '@/test/render'
+import type { DashboardData } from '@/types/dashboard'
 import App, { AppRoutes } from './App'
 
 describe('App', () => {
@@ -62,5 +65,21 @@ describe('rotas', () => {
   it('o botão do menu mobile está no shell', () => {
     renderWithProviders(<AppRoutes />)
     expect(screen.getByRole('button', { name: 'Abrir menu' })).toBeInTheDocument()
+  })
+})
+
+describe('erro inesperado numa página', () => {
+  it('fica dentro do shell: a navegação continua e trocar de rota limpa o erro', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    // Uma página que quebra ao renderizar: dados com formato inesperado vindos da API.
+    const broken: Fetcher = () => Promise.resolve({ ...createMockData('24h'), events: [null] } as unknown as DashboardData)
+    const { user } = renderWithProviders(<AppRoutes />, { route: '/eventos', fetcher: broken })
+    expect(await screen.findByText('Algo deu errado nesta página.')).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Principal' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('link', { name: 'Ativos' }))
+    expect(screen.getByRole('heading', { level: 1, name: 'Ativos' })).toBeInTheDocument()
+    expect(screen.queryByText('Algo deu errado nesta página.')).not.toBeInTheDocument()
+    vi.restoreAllMocks()
   })
 })
