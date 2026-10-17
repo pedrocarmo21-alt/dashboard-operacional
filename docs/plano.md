@@ -529,7 +529,7 @@ it('botão "Limpar filtros" aparece só com filtro ativo e restaura os padrões'
 
 **Interfaces:**
 - Consome: `Kpi`, `AsyncStatus`, `formatNumber`, `formatMs`, `formatCompact`, `formatPercentDelta`
-- Produz: `KpiCard({ kpi }: { kpi: Kpi })`, `KpiGrid({ kpis, status }: { kpis: Kpi[]; status: AsyncStatus })`
+- Produz: `KpiCard({ kpi }: { kpi: Kpi })` (um `<dl>` por card; ingestão como `1.234 ev/s`), `KpiGrid({ kpis, status, onRetry? }: { kpis: Kpi[]; status: AsyncStatus; onRetry?: () => void })`
 
 - [ ] **Passo 1: Escrever os testes que falham**
 
