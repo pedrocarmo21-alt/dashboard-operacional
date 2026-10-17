@@ -1,8 +1,9 @@
 import { Outlet } from 'react-router'
-import { MobileNav } from './MobileNav'
+import { Toaster } from '@/components/ui/sonner'
+import { Header } from './Header'
 import { Sidebar } from './Sidebar'
 
-/** Estrutura de todas as páginas: link de pular, sidebar, barra superior e conteúdo. */
+/** Estrutura de todas as páginas: link de pular, sidebar, header, conteúdo e notificações toast. */
 export function AppShell() {
   return (
     <div className="flex min-h-svh">
@@ -14,13 +15,12 @@ export function AppShell() {
       </a>
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="sticky top-0 z-10 flex h-12 items-center gap-2 border-b bg-background px-2 md:px-6">
-          <MobileNav />
-        </div>
+        <Header />
         <main id="conteudo" tabIndex={-1} className="flex-1 p-4 outline-none md:p-6">
           <Outlet />
         </main>
       </div>
+      <Toaster />
     </div>
   )
 }

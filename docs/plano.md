@@ -469,7 +469,7 @@ expect(screen.getByText('Verificando…')).toBeInTheDocument()
 // NotificationsMenu (com fetcher que retorna 3 alertas não reconhecidos)
 expect(await screen.findByRole('button', { name: 'Notificações, 3 não lidas' })).toBeInTheDocument()
 await user.click(screen.getByRole('button', { name: /Notificações/ }))
-await user.click(screen.getAllByRole('button', { name: 'Reconhecer' })[0])
+await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 1' }))   // nome único por alerta
 expect(screen.getByRole('button', { name: 'Notificações, 2 não lidas' })).toBeInTheDocument()
 await user.click(screen.getByRole('link', { name: 'Ver todos os alertas' }))   // navega para /alertas
 it('sem alertas pendentes mostra "Nenhuma notificação"', ...)
@@ -484,7 +484,7 @@ expect(await screen.findByText('Demonstração: autenticação não configurada.
 
 - [ ] **Passo 3: Implementar**
 
-O header tem 48px de altura e borda inferior. O status do sistema é um ponto de 6px na cor do sinal + rótulo em mono. O menu de notificações mostra os 5 alertas não reconhecidos mais recentes. O perfil mostra "Operador · Turno A" e os itens "Sair" (toast via `sonner`) e "Atalhos de teclado" (abre um popover listando `/` para buscar). O `<Toaster/>` fica no `AppShell`.
+O header tem 48px de altura e borda inferior. O status do sistema é um ponto de 6px na cor do sinal + rótulo em mono. O menu de notificações mostra os 5 alertas não reconhecidos mais recentes. O perfil mostra "Operador · Turno A", a lista de atalhos de teclado dentro do próprio menu (`/` foca a busca, `Esc` limpa a busca e fecha menus) e o item "Sair" (toast via `sonner`). O tempo relativo das notificações é calculado a partir de `data.generatedAt`, não do relógio da máquina. O `<Toaster/>` fica no `AppShell`.
 
 - [ ] **Passo 4: Rodar e ver passar** → PASS
 

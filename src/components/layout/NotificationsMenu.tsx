@@ -1,0 +1,123 @@
+import { Bell } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Link } from 'react-router'
+import { Button } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useDashboardData } from '@/hooks/dashboard-data'
+import { formatRelativeTime } from '@/lib/format'
+import { SEVERITY_LABEL } from '@/lib/labels'
+import { cn } from '@/lib/utils'
+import type { Alert, Severity } from '@/types/dashboard'
+
+const VISIBLE = 5
+
+const SEVERITY_DOT: Record<Severity, string> = {
+  info: 'bg-muted-foreground',
+  warning: 'bg-signal-warn',
+  critical: 'bg-signal-critical',
+}
+
+function triggerLabel(pending: number | undefined): string {
+  if (pending === undefined) return 'Notificações'
+  if (pending === 0) return 'Notificações, nenhuma não lida'
+  return `Notificações, ${pending} ${pending === 1 ? 'não lida' : 'não lidas'}`
+}
+
+/** Sino do header: alertas pendentes mais recentes, com reconhecimento rápido. */
+export function NotificationsMenu() {
+  const [open, setOpen] = useState(false)
+  const { status, data, acknowledgeAlert } = useDashboardData()
+
+  const pending = useMemo(
+    () => data?.alerts.filter((a) => !a.acknowledged).sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    [data],
+  )
+  const count = pending?.length
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button type="button" variant="ghost" size="icon" className="relative" aria-label={triggerLabel(count)}>
+          <Bell aria-hidden="true" />
+          {count !== undefined && count > 0 && (
+            <span
+              data-testid="notifications-count"
+              aria-hidden="true"
+              className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-signal-warn px-1 font-mono text-[10px] leading-none text-background"
+            >
+              {count > 9 ? '9+' : count}
+            </span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-80 gap-0 p-0">
+        <p className="border-b px-3 py-2 text-xs font-medium tracking-wider text-muted-foreground uppercase">
+          Notificações
+        </p>
+        <div className="max-h-80 overflow-y-auto">
+          {pending === undefined ? (
+            <p className="px-3 py-4 text-sm text-muted-foreground">
+              {status === 'error' ? 'Não foi possível carregar as notificações.' : 'Carregando…'}
+            </p>
+          ) : pending.length === 0 ? (
+            <p className="px-3 py-4 text-sm text-muted-foreground">Nenhuma notificação</p>
+          ) : (
+            <ul aria-label="Alertas pendentes" className="divide-y">
+              {pending.slice(0, VISIBLE).map((alert) => (
+                <NotificationItem
+                  key={alert.id}
+                  alert={alert}
+                  now={new Date(data!.generatedAt)}
+                  onAcknowledge={acknowledgeAlert}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="border-t px-3 py-2">
+          <Link
+            to="/alertas"
+            onClick={() => setOpen(false)}
+            className="text-xs text-signal-ok underline-offset-4 hover:underline"
+          >
+            Ver todos os alertas
+          </Link>
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+function NotificationItem({
+  alert,
+  now,
+  onAcknowledge,
+}: {
+  alert: Alert
+  now: Date
+  onAcknowledge: (id: string) => void
+}) {
+  return (
+    <li className="flex items-start gap-2.5 px-3 py-2.5">
+      <span aria-hidden="true" className={cn('mt-1.5 size-1.5 shrink-0 rounded-full', SEVERITY_DOT[alert.severity])} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm">
+          <span className="sr-only">{SEVERITY_LABEL[alert.severity]}: </span>
+          {alert.title}
+        </p>
+        <p className="font-mono text-xs text-muted-foreground">
+          {alert.assetId} · {formatRelativeTime(alert.createdAt, now)}
+        </p>
+      </div>
+      <Button
+        type="button"
+        variant="ghost"
+        size="xs"
+        aria-label={`Reconhecer alerta ${alert.title}`}
+        onClick={() => onAcknowledge(alert.id)}
+      >
+        Reconhecer
+      </Button>
+    </li>
+  )
+}
