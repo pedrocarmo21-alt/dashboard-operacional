@@ -31,6 +31,18 @@ describe('projeto', () => {
     expect(offenders).toEqual([])
   })
 
+  it('verde é só para sinais: nenhum link usa a cor de status', () => {
+    const sources = import.meta.glob<string>(['./**/*.tsx', '!./**/*.test.tsx'], {
+      query: '?raw',
+      import: 'default',
+      eager: true,
+    })
+    const offenders = Object.entries(sources)
+      .filter(([, source]) => [...source.matchAll(/<Link\b[\s\S]*?>/g)].some(([tag]) => tag.includes('signal-ok')))
+      .map(([file]) => file)
+    expect(offenders).toEqual([])
+  })
+
   it('não menciona as marcas que inspiram o visual', () => {
     const sources = import.meta.glob<string>(['./**/*.{ts,tsx,css}', '!./**/*.test.{ts,tsx}', '../index.html'], {
       query: '?raw',

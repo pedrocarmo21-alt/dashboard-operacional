@@ -51,7 +51,7 @@ export function ActivityFeed({ events, severity, query, limit, now }: ActivityFe
         ))}
       </ol>
       {limit !== undefined && rows.length > limit && (
-        <Link to="/eventos" className="self-start text-xs text-signal-ok underline-offset-4 hover:underline">
+        <Link to="/eventos" className="self-start text-xs text-foreground underline decoration-muted-foreground underline-offset-4 hover:decoration-foreground">
           Ver todos os {rows.length} eventos
         </Link>
       )}

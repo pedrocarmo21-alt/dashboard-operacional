@@ -93,7 +93,7 @@ export function NotificationsMenu() {
             ref={seeAllRef}
             to="/alertas"
             onClick={() => setOpen(false)}
-            className="text-xs text-signal-ok underline-offset-4 hover:underline"
+            className="text-xs text-foreground underline decoration-muted-foreground underline-offset-4 hover:decoration-foreground"
           >
             Ver todos os alertas
           </Link>

@@ -125,7 +125,7 @@ export function AssetsTable({ assets, query, limit, now }: AssetsTableProps) {
       {limit !== undefined && rows.length > limit && (
         <Link
           to={status === 'all' ? '/ativos' : `/ativos?status=${status}`}
-          className="self-start text-xs text-signal-ok underline-offset-4 hover:underline"
+          className="self-start text-xs text-foreground underline decoration-muted-foreground underline-offset-4 hover:decoration-foreground"
         >
           Ver todos os {rows.length} ativos
         </Link>
