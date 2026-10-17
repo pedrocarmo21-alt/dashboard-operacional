@@ -11,7 +11,7 @@ describe('KpiGrid', () => {
     expect(screen.getByRole('region', { name: 'Indicadores' })).toBeInTheDocument()
     expect(screen.getAllByRole('term').map((t) => t.textContent)).toEqual([
       'Ativos online',
-      'Incidentes abertos',
+      'Alertas pendentes',
       'Latência média',
       'Taxa de ingestão',
     ])

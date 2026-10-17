@@ -6,8 +6,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 // O Recharts é a maior dependência do app: carregado sob demanda, ele vai para um arquivo
 // separado e o resto da interface não espera por ele.
 const ThroughputChartImpl = lazy(() => import('./ThroughputChart').then((m) => ({ default: m.ThroughputChart })))
-const IncidentsBySeverityChartImpl = lazy(() =>
-  import('./IncidentsBySeverityChart').then((m) => ({ default: m.IncidentsBySeverityChart })),
+const AlertsBySeverityChartImpl = lazy(() =>
+  import('./AlertsBySeverityChart').then((m) => ({ default: m.AlertsBySeverityChart })),
 )
 
 function ChartFallback({ height }: { height: string }) {
@@ -39,11 +39,11 @@ export function ThroughputChart(props: ComponentProps<typeof ThroughputChartImpl
   )
 }
 
-export function IncidentsBySeverityChart(props: ComponentProps<typeof IncidentsBySeverityChartImpl>) {
+export function AlertsBySeverityChart(props: ComponentProps<typeof AlertsBySeverityChartImpl>) {
   return (
     <ErrorBoundary fallback={<ChartError />}>
       <Suspense fallback={<ChartFallback height="h-36" />}>
-        <IncidentsBySeverityChartImpl {...props} />
+        <AlertsBySeverityChartImpl {...props} />
       </Suspense>
     </ErrorBoundary>
   )

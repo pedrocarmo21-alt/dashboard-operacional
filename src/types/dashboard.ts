@@ -6,7 +6,7 @@ export type SystemStatus = 'operational' | 'degraded' | 'outage'
 export type AsyncStatus = 'loading' | 'success' | 'empty' | 'error'
 /** Status de uma requisição; `empty` só existe no nível do painel. */
 export type RequestStatus = Exclude<AsyncStatus, 'empty'>
-export type KpiId = 'assetsOnline' | 'openIncidents' | 'avgLatency' | 'ingestRate'
+export type KpiId = 'assetsOnline' | 'pendingAlerts' | 'avgLatency' | 'ingestRate'
 
 export interface Kpi {
   id: KpiId

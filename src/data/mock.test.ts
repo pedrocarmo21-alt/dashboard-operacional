@@ -30,7 +30,7 @@ describe('createMockData', () => {
     expect(d.assets).toHaveLength(40)
     expect(d.alerts).toHaveLength(12)
     expect(d.events).toHaveLength(25)
-    expect(d.kpis.map((k) => k.id)).toEqual(['assetsOnline', 'openIncidents', 'avgLatency', 'ingestRate'])
+    expect(d.kpis.map((k) => k.id)).toEqual(['assetsOnline', 'pendingAlerts', 'avgLatency', 'ingestRate'])
   })
 
   it('alertas de períodos diferentes têm ids diferentes', () => {
@@ -86,8 +86,8 @@ describe.each(PERIODS)('consistência interna (%s)', (period) => {
     expect(kpi(d, 'assetsOnline').value).toBe(d.assets.filter((a) => a.status === 'online').length)
   })
 
-  it('KPI de incidentes abertos conta os alertas não reconhecidos', () => {
-    expect(kpi(d, 'openIncidents').value).toBe(d.alerts.filter((a) => !a.acknowledged).length)
+  it('KPI de alertas pendentes conta os alertas não reconhecidos', () => {
+    expect(kpi(d, 'pendingAlerts').value).toBe(d.alerts.filter((a) => !a.acknowledged).length)
   })
 
   it('KPI de latência média ignora ativos offline', () => {
@@ -103,7 +103,7 @@ describe.each(PERIODS)('consistência interna (%s)', (period) => {
   it('KPIs têm unidade, direção boa e variação finita', () => {
     expect(d.kpis.map((k) => [k.id, k.unit, k.goodWhen])).toEqual([
       ['assetsOnline', 'count', 'up'],
-      ['openIncidents', 'count', 'down'],
+      ['pendingAlerts', 'count', 'down'],
       ['avgLatency', 'ms', 'down'],
       ['ingestRate', 'eventsPerSec', 'up'],
     ])

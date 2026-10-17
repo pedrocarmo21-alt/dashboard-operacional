@@ -27,7 +27,7 @@ interface Row {
  * por aquela severidade; clicar de novo remove o filtro. Os botões são o equivalente
  * acessível do gráfico, com rótulo e contagem.
  */
-export function IncidentsBySeverityChart({ alerts }: { alerts: Alert[] }) {
+export function AlertsBySeverityChart({ alerts }: { alerts: Alert[] }) {
   const { severity, setSeverity } = useFilters()
   const captionId = useId()
   const counts = countBySeverity(alerts)
@@ -86,6 +86,7 @@ export function IncidentsBySeverityChart({ alerts }: { alerts: Alert[] }) {
           </BarChart>
         </ResponsiveContainer>
       </div>
+      <p className="text-xs text-muted-foreground">Todos os alertas do período, sem a busca.</p>
       <div role="group" aria-label="Filtrar por severidade" className="flex flex-wrap gap-1.5">
         {rows.map((row) => (
           <button

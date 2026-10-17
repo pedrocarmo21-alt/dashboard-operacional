@@ -14,8 +14,8 @@ const VISIBLE = 5
 
 function triggerLabel(pending: number | undefined): string {
   if (pending === undefined) return 'Notificações'
-  if (pending === 0) return 'Notificações, nenhuma não lida'
-  return `Notificações, ${pending} ${pending === 1 ? 'não lida' : 'não lidas'}`
+  if (pending === 0) return 'Notificações, nenhum pendente'
+  return `Notificações, ${pending} ${pending === 1 ? 'pendente' : 'pendentes'}`
 }
 
 /** Sino do header: alertas pendentes mais recentes, com reconhecimento rápido. */

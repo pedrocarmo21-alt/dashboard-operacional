@@ -42,17 +42,17 @@ const trigger = () => screen.getByRole('button', { name: /^Notificações/ })
 describe('NotificationsMenu', () => {
   it('o botão diz quantos alertas estão pendentes', async () => {
     setup([alert(1), alert(2), alert(3), alert(4, { acknowledged: true })])
-    expect(await screen.findByRole('button', { name: 'Notificações, 3 não lidas' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Notificações, 3 pendentes' })).toBeInTheDocument()
   })
 
   it('singular com um alerta pendente', async () => {
     setup([alert(1)])
-    expect(await screen.findByRole('button', { name: 'Notificações, 1 não lida' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Notificações, 1 pendente' })).toBeInTheDocument()
   })
 
   it('sem pendentes, o botão não mostra contador', async () => {
     setup([alert(1, { acknowledged: true })])
-    expect(await screen.findByRole('button', { name: 'Notificações, nenhuma não lida' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Notificações, nenhum pendente' })).toBeInTheDocument()
     expect(screen.queryByTestId('notifications-count')).not.toBeInTheDocument()
   })
 
@@ -63,7 +63,7 @@ describe('NotificationsMenu', () => {
 
   it('lista os 5 pendentes mais recentes com tempo relativo', async () => {
     const { user } = setup(Array.from({ length: 7 }, (_, i) => alert(i + 1)))
-    await user.click(await screen.findByRole('button', { name: 'Notificações, 7 não lidas' }))
+    await user.click(await screen.findByRole('button', { name: 'Notificações, 7 pendentes' }))
     const items = within(screen.getByRole('list', { name: 'Alertas pendentes' })).getAllByRole('listitem')
     expect(items).toHaveLength(5)
     expect(items[0]).toHaveTextContent('Alerta 1')
@@ -73,21 +73,21 @@ describe('NotificationsMenu', () => {
 
   it('não lista alertas já reconhecidos', async () => {
     const { user } = setup([alert(1), alert(2, { acknowledged: true, title: 'Já visto' })])
-    await user.click(await screen.findByRole('button', { name: 'Notificações, 1 não lida' }))
+    await user.click(await screen.findByRole('button', { name: 'Notificações, 1 pendente' }))
     expect(screen.queryByText('Já visto')).not.toBeInTheDocument()
   })
 
   it('reconhecer tira o alerta da lista e atualiza o contador', async () => {
     const { user } = setup([alert(1), alert(2), alert(3)])
-    await user.click(await screen.findByRole('button', { name: 'Notificações, 3 não lidas' }))
+    await user.click(await screen.findByRole('button', { name: 'Notificações, 3 pendentes' }))
     await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 1 (AT-0001)' }))
     expect(screen.queryByText('Alerta 1')).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Notificações, 2 não lidas' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Notificações, 2 pendentes' })).toBeInTheDocument()
   })
 
   it('depois de reconhecer, o foco vai para o próximo alerta, com o menu aberto', async () => {
     const { user } = setup([alert(1), alert(2)])
-    await user.click(await screen.findByRole('button', { name: 'Notificações, 2 não lidas' }))
+    await user.click(await screen.findByRole('button', { name: 'Notificações, 2 pendentes' }))
     await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 1 (AT-0001)' }))
     expect(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 2 (AT-0001)' })).toHaveFocus()
     expect(screen.getByRole('list', { name: 'Alertas pendentes' })).toBeInTheDocument()
@@ -95,7 +95,7 @@ describe('NotificationsMenu', () => {
 
   it('reconhecendo o último, o foco vai para "Ver todos os alertas"', async () => {
     const { user } = setup([alert(1)])
-    await user.click(await screen.findByRole('button', { name: 'Notificações, 1 não lida' }))
+    await user.click(await screen.findByRole('button', { name: 'Notificações, 1 pendente' }))
     await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 1 (AT-0001)' }))
     expect(screen.getByRole('link', { name: 'Ver todos os alertas' })).toHaveFocus()
     expect(screen.getByText('Nenhuma notificação')).toBeInTheDocument()
@@ -111,7 +111,7 @@ describe('NotificationsMenu', () => {
 
   it('sem alertas pendentes mostra "Nenhuma notificação"', async () => {
     const { user } = setup([])
-    await user.click(await screen.findByRole('button', { name: 'Notificações, nenhuma não lida' }))
+    await user.click(await screen.findByRole('button', { name: 'Notificações, nenhum pendente' }))
     expect(screen.getByText('Nenhuma notificação')).toBeInTheDocument()
   })
 

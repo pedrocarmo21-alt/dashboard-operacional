@@ -17,7 +17,7 @@ function setup(fetcher?: Fetcher) {
   return renderHook(() => ({ filters: useFilters(), dash: useDashboardData() }), { wrapper })
 }
 
-const openIncidents = (d: DashboardData | undefined) => d?.kpis.find((k) => k.id === 'openIncidents')?.value
+const pendingAlerts = (d: DashboardData | undefined) => d?.kpis.find((k) => k.id === 'pendingAlerts')?.value
 
 describe('useDashboardData', () => {
   afterEach(() => {
@@ -77,12 +77,12 @@ describe('useDashboardData', () => {
       expect(result.current.dash.data!.alerts.find((a) => a.id === pending.id)?.acknowledged).toBe(true)
     })
 
-    it('atualiza o KPI de incidentes abertos', async () => {
+    it('atualiza o KPI de alertas pendentes', async () => {
       const { result } = await loaded()
-      const before = openIncidents(result.current.dash.data)!
+      const before = pendingAlerts(result.current.dash.data)!
       const pending = result.current.dash.data!.alerts.find((a) => !a.acknowledged)!
       act(() => result.current.dash.acknowledgeAlert(pending.id))
-      expect(openIncidents(result.current.dash.data)).toBe(before - 1)
+      expect(pendingAlerts(result.current.dash.data)).toBe(before - 1)
     })
 
     it('reconhecer todos os críticos deixa o sistema operacional', async () => {

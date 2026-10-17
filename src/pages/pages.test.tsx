@@ -41,11 +41,11 @@ describe('página de alertas', () => {
   it('reconhecer na página atualiza o contador do sino', async () => {
     const { user } = renderWithProviders(<AppRoutes />, { route: '/alertas' })
     const list = await screen.findByRole('list', { name: 'Alertas' })
-    const bell = screen.getByRole('button', { name: /^Notificações, \d+ não lidas?$/ })
+    const bell = screen.getByRole('button', { name: /^Notificações, \d+ pendentes?$/ })
     const before = Number(bell.getAttribute('aria-label')!.match(/\d+/)![0])
     await user.click(within(list).getAllByRole('button', { name: /^Reconhecer alerta/ })[0])
     expect(bell).toHaveAccessibleName(
-      before - 1 === 1 ? 'Notificações, 1 não lida' : `Notificações, ${before - 1} não lidas`,
+      before - 1 === 1 ? 'Notificações, 1 pendente' : `Notificações, ${before - 1} pendentes`,
     )
   })
 })

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { createMockData } from '@/data/mock'
 import { renderWithProviders } from '@/test/render'
 import { LAZY_CHART } from '@/test/timeouts'
-import { IncidentsBySeverityChart, ThroughputChart } from './lazy'
+import { AlertsBySeverityChart, ThroughputChart } from './lazy'
 
 describe('gráficos sob demanda', () => {
   it('mostra um esqueleto enquanto o gráfico carrega, depois o gráfico', async () => {
@@ -14,7 +14,7 @@ describe('gráficos sob demanda', () => {
   })
 
   it('o de severidade também carrega', async () => {
-    renderWithProviders(<IncidentsBySeverityChart alerts={createMockData('24h').alerts} />)
+    renderWithProviders(<AlertsBySeverityChart alerts={createMockData('24h').alerts} />)
     expect(await screen.findByRole('figure', { name: 'Alertas por severidade' }, LAZY_CHART)).toBeInTheDocument()
   })
 })

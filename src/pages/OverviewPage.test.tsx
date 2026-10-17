@@ -67,7 +67,7 @@ describe('OverviewPage', () => {
     expect(await screen.findByText('Sem indicadores para o período.')).toBeInTheDocument()
     expect(within(region('Ingestão de eventos')).getByText('Sem dados de ingestão no período.')).toBeInTheDocument()
     expect(within(region('Alertas por severidade')).getByText('Nenhum alerta no período.')).toBeInTheDocument()
-    expect(within(region('Ativos')).getByText('Nenhum ativo no período.')).toBeInTheDocument()
+    expect(within(region('Ativos')).getByText('Nenhum ativo cadastrado.')).toBeInTheDocument()
     expect(within(region('Alertas')).getByText('Nenhum alerta no período.')).toBeInTheDocument()
     expect(within(region('Eventos')).getByText('Nenhum evento registrado.')).toBeInTheDocument()
   })
@@ -108,12 +108,12 @@ describe('OverviewPage', () => {
     )
   })
 
-  it('reconhecer um alerta atualiza o KPI de incidentes abertos', async () => {
+  it('reconhecer um alerta atualiza o KPI de alertas pendentes', async () => {
     const { user } = renderWithProviders(<OverviewPage />)
     await screen.findByText('Latência média')
-    const before = Number(kpiValue('Incidentes abertos'))
+    const before = Number(kpiValue('Alertas pendentes'))
     await user.click(within(region('Alertas')).getAllByRole('button', { name: /^Reconhecer alerta/ })[0])
-    expect(Number(kpiValue('Incidentes abertos'))).toBe(before - 1)
+    expect(Number(kpiValue('Alertas pendentes'))).toBe(before - 1)
   })
 
   it('reconhecer no painel resumido mantém o foco dentro do painel', async () => {
@@ -122,6 +122,19 @@ describe('OverviewPage', () => {
     await user.click(within(region('Alertas')).getAllByRole('button', { name: /^Reconhecer alerta/ })[0])
     expect(document.activeElement).not.toBe(document.body)
     expect(region('Alertas')).toContainElement(document.activeElement as HTMLElement)
+  })
+
+  it('a busca não muda os KPIs nem o gráfico de severidade, que mostram o período inteiro', async () => {
+    const { user } = renderWithProviders(<AppRoutes />)
+    await screen.findByText('Latência média')
+    const severity = () =>
+      within(region('Alertas por severidade'))
+        .getAllByRole('button', { name: /^(Crítico|Aviso|Info): \d+$/ })
+        .map((b) => b.getAttribute('aria-label'))
+    const before = { kpi: kpiValue('Alertas pendentes'), severity: severity() }
+    await user.type(screen.getByRole('searchbox', { name: 'Buscar ativos, alertas e eventos' }), 'zzz')
+    expect(within(region('Alertas')).getByText('Nenhum alerta para os filtros atuais.')).toBeInTheDocument()
+    expect({ kpi: kpiValue('Alertas pendentes'), severity: severity() }).toEqual(before)
   })
 
   it('a busca do header filtra a tabela da visão geral', async () => {

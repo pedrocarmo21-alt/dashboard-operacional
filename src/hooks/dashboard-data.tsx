@@ -20,7 +20,7 @@ const DashboardDataContext = createContext<DashboardDataState | null>(null)
 const defaultFetcher: Fetcher = (period, signal) =>
   fetchDashboard(period, signal, getSimulationMode(window.location.search))
 
-// Reconhecer um alerta muda também o KPI de incidentes abertos e o status do sistema.
+// Reconhecer um alerta muda também o KPI de alertas pendentes e o status do sistema.
 function applyAcknowledged(data: DashboardData, acknowledged: ReadonlySet<string>): DashboardData {
   if (!data.alerts.some((a) => !a.acknowledged && acknowledged.has(a.id))) return data
   const alerts = data.alerts.map((a) => (acknowledged.has(a.id) ? { ...a, acknowledged: true } : a))
@@ -29,7 +29,7 @@ function applyAcknowledged(data: DashboardData, acknowledged: ReadonlySet<string
   return {
     ...data,
     alerts,
-    kpis: data.kpis.map((k) => (k.id === 'openIncidents' ? { ...k, value: open } : k)),
+    kpis: data.kpis.map((k) => (k.id === 'pendingAlerts' ? { ...k, value: open } : k)),
     systemStatus: data.systemStatus === 'outage' ? 'outage' : pendingCritical ? 'degraded' : 'operational',
   }
 }

@@ -182,8 +182,8 @@ function createKpis(rng: Rng, assets: Asset[], alerts: Alert[], throughput: Thro
       goodWhen: 'up',
     },
     {
-      id: 'openIncidents',
-      label: 'Incidentes abertos',
+      id: 'pendingAlerts',
+      label: 'Alertas pendentes',
       value: alerts.filter((a) => !a.acknowledged).length,
       unit: 'count',
       delta: round1(between(rng, -30, 30)),

@@ -75,7 +75,7 @@ src/
 ├── components/
 │   ├── ui/                       # shadcn
 │   ├── layout/                   # AppShell, Sidebar, MobileNav, Header, NotificationsMenu, ProfileMenu, SystemStatusBadge
-│   ├── charts/                   # ThroughputChart, IncidentsBySeverityChart
+│   ├── charts/                   # ThroughputChart, AlertsBySeverityChart
 │   └── dashboard/                # Panel, FilterBar, KpiCard, KpiGrid, AssetsTable, AlertsPanel, ActivityFeed
 ├── pages/                        # OverviewPage, AssetsPage, AlertsPage, EventsPage, NotFoundPage
 └── test/
@@ -224,7 +224,7 @@ export type AssetType = 'sensor' | 'veiculo' | 'estacao'
 export type SystemStatus = 'operational' | 'degraded' | 'outage'
 export type AsyncStatus = 'loading' | 'success' | 'empty' | 'error'
 export type RequestStatus = Exclude<AsyncStatus, 'empty'>
-export type KpiId = 'assetsOnline' | 'openIncidents' | 'avgLatency' | 'ingestRate'
+export type KpiId = 'assetsOnline' | 'pendingAlerts' | 'avgLatency' | 'ingestRate'
 export interface Kpi { id: KpiId; label: string; value: number; unit: 'count' | 'ms' | 'eventsPerSec'; delta: number; goodWhen: 'up' | 'down' }
 export interface ThroughputPoint { timestamp: string; eventsPerSec: number }
 export interface Asset { id: string; name: string; type: AssetType; region: string; status: AssetStatus; latencyMs: number; lastSeen: string }
@@ -254,7 +254,7 @@ it('gera 40 ativos, 12 alertas, 25 eventos e os 4 KPIs', () => {
   expect(d.assets).toHaveLength(40)
   expect(d.alerts).toHaveLength(12)
   expect(d.events).toHaveLength(25)
-  expect(d.kpis.map(k => k.id)).toEqual(['assetsOnline', 'openIncidents', 'avgLatency', 'ingestRate'])
+  expect(d.kpis.map(k => k.id)).toEqual(['assetsOnline', 'pendingAlerts', 'avgLatency', 'ingestRate'])
 })
 it('mantém consistência interna', () => {
   const d = createMockData('7d')
@@ -270,7 +270,7 @@ it('mantém consistência interna', () => {
 
 - [ ] **Passo 3: Implementar**
 
-PRNG `mulberry32(seed)` local em `mock.ts`, com todos os timestamps relativos a `REFERENCE_NOW`. Intervalo dos pontos: 1 h (24h), 6 h (7d) e 1 dia (30d). Nomes realistas como `Estação Norte-03`, `Sensor Óptico 12` e `Veículo Patrulha 07`. Regiões: Norte, Sul, Leste, Oeste, Centro. Distribuição aproximada dos status: 80% online, 15% degradado, 5% offline. `openIncidents` = alertas não reconhecidos. `systemStatus` = `'degraded'` se houver alerta crítico não reconhecido; senão `'operational'`.
+PRNG `mulberry32(seed)` local em `mock.ts`, com todos os timestamps relativos a `REFERENCE_NOW`. Intervalo dos pontos: 1 h (24h), 6 h (7d) e 1 dia (30d). Nomes realistas como `Estação Norte-03`, `Sensor Óptico 12` e `Veículo Patrulha 07`. Regiões: Norte, Sul, Leste, Oeste, Centro. Distribuição aproximada dos status: 80% online, 15% degradado, 5% offline. `pendingAlerts` = alertas não reconhecidos. `systemStatus` = `'degraded'` se houver alerta crítico não reconhecido; senão `'operational'`.
 
 - [ ] **Passo 4: Rodar e ver passar** — `npm test -- --run src/data` → PASS
 
@@ -467,10 +467,10 @@ render(<SystemStatusBadge status={undefined} />)
 expect(screen.getByText('Verificando…')).toBeInTheDocument()
 
 // NotificationsMenu (com fetcher que retorna 3 alertas não reconhecidos)
-expect(await screen.findByRole('button', { name: 'Notificações, 3 não lidas' })).toBeInTheDocument()
+expect(await screen.findByRole('button', { name: 'Notificações, 3 pendentes' })).toBeInTheDocument()
 await user.click(screen.getByRole('button', { name: /Notificações/ }))
 await user.click(screen.getByRole('button', { name: 'Reconhecer alerta Alerta 1' }))   // nome único por alerta
-expect(screen.getByRole('button', { name: 'Notificações, 2 não lidas' })).toBeInTheDocument()
+expect(screen.getByRole('button', { name: 'Notificações, 2 pendentes' })).toBeInTheDocument()
 await user.click(screen.getByRole('link', { name: 'Ver todos os alertas' }))   // navega para /alertas
 it('sem alertas pendentes mostra "Nenhuma notificação"', ...)
 
@@ -565,8 +565,8 @@ Valor em JetBrains Mono, `text-2xl tabular-nums`. Tendência `good` em `--signal
 ### Tarefa 10: Gráficos
 
 **Arquivos:**
-- Criar: `src/components/charts/ThroughputChart.tsx`, `src/components/charts/IncidentsBySeverityChart.tsx`, `src/components/charts/chart-data.ts`
-- Teste: `src/components/charts/chart-data.test.ts`, `ThroughputChart.test.tsx`, `IncidentsBySeverityChart.test.tsx`
+- Criar: `src/components/charts/ThroughputChart.tsx`, `src/components/charts/AlertsBySeverityChart.tsx`, `src/components/charts/chart-data.ts`
+- Teste: `src/components/charts/chart-data.test.ts`, `ThroughputChart.test.tsx`, `AlertsBySeverityChart.test.tsx`
 
 **Interfaces:**
 - Consome: `ThroughputPoint`, `Alert`, `Period`, `Severity`, `PERIOD_LABEL`, `SEVERITY_LABEL`, `useFilters()`
@@ -574,7 +574,7 @@ Valor em JetBrains Mono, `text-2xl tabular-nums`. Tendência `good` em `--signal
   - `countBySeverity(alerts: Alert[]): Record<Severity, number>`
   - `summarizeThroughput(points: ThroughputPoint[]): { min: number; max: number; avg: number } | null`
   - `ThroughputChart({ data, period }: { data: ThroughputPoint[]; period: Period })`
-  - `IncidentsBySeverityChart({ alerts }: { alerts: Alert[] })`, que lê e altera `useFilters().severity`
+  - `AlertsBySeverityChart({ alerts }: { alerts: Alert[] })`, que lê e altera `useFilters().severity`
 
 - [ ] **Passo 1: Escrever os testes que falham**
 
@@ -589,7 +589,7 @@ renderWithProviders(<ThroughputChart data={pts} period="24h" />)
 expect(screen.getByRole('img', { name: /Ingestão de eventos por segundo, últimas 24 h/ })).toBeInTheDocument()
 expect(screen.getByText(/Média/)).toBeInTheDocument()            // resumo textual (min/média/máx) visível
 
-renderWithProviders(<IncidentsBySeverityChart alerts={alerts} />)
+renderWithProviders(<AlertsBySeverityChart alerts={alerts} />)
 await user.click(screen.getByRole('button', { name: 'Crítico: 2' }))
 // useFilters().severity → 'critical'; o botão fica com aria-pressed="true"
 await user.click(screen.getByRole('button', { name: 'Crítico: 2' }))
@@ -599,7 +599,7 @@ await user.click(screen.getByRole('button', { name: 'Crítico: 2' }))
 - [ ] **Passo 2: Rodar e ver falhar** → FAIL
 - [ ] **Passo 3: Implementar**
 
-`ThroughputChart` é um `LineChart` com linha verde de 1.5px, sem preenchimento em gradiente, grid horizontal em `--border`, eixos em mono 11px e `Tooltip` escuro com borda. `IncidentsBySeverityChart` é um `BarChart` horizontal (Info em cinza, Aviso em âmbar, Crítico em vermelho); clicar na barra alterna o filtro. Abaixo dele ficam botões-legenda com `aria-pressed`, que fazem a mesma coisa pelo teclado. Os dois ficam num wrapper `role="img"` com `aria-label` descritivo, dentro de um `ResponsiveContainer` de altura 220.
+`ThroughputChart` é um `LineChart` com linha verde de 1.5px, sem preenchimento em gradiente, grid horizontal em `--border`, eixos em mono 11px e `Tooltip` escuro com borda. `AlertsBySeverityChart` é um `BarChart` horizontal (Info em cinza, Aviso em âmbar, Crítico em vermelho); clicar na barra alterna o filtro. Abaixo dele ficam botões-legenda com `aria-pressed`, que fazem a mesma coisa pelo teclado. Os dois ficam num wrapper `role="img"` com `aria-label` descritivo, dentro de um `ResponsiveContainer` de altura 220.
 
 - [ ] **Passo 4: Rodar e ver passar** → PASS
 - [ ] **Passo 5: Commit** — `feat: adiciona gráficos de ingestão e incidentes por severidade`
@@ -713,7 +713,7 @@ Listas `<ol>` densas. Cada item tem uma barra de 2px na cor da severidade, títu
 - Consome: tudo das Tarefas 5 a 12. Cada painel recebe `status={derivePanelStatus(status, itens.length)}` e `onRetry={retry}`.
 
 Composição:
-- **Visão geral:** `FilterBar`, `KpiGrid`, `ThroughputChart` (2/3) + `IncidentsBySeverityChart` (1/3), `AssetsTable limit={8}` (2/3) + `AlertsPanel limit={5}` (1/3), `ActivityFeed limit={8}`.
+- **Visão geral:** `FilterBar`, `KpiGrid`, `ThroughputChart` (2/3) + `AlertsBySeverityChart` (1/3), `AssetsTable limit={8}` (2/3) + `AlertsPanel limit={5}` (1/3), `ActivityFeed limit={8}`.
 - **Ativos:** `FilterBar showSeverity={false}` + `AssetsTable`.
 - **Alertas:** `FilterBar` + `AlertsPanel`.
 - **Eventos:** `FilterBar` + `ActivityFeed`.

@@ -16,7 +16,7 @@ export function AssetsPage() {
     <div className="flex flex-col gap-4">
       <PageHeader title="Ativos" />
       <DataStatus {...dataStatus} />
-      <Panel title="Todos os ativos" emptyMessage="Nenhum ativo no período." {...panel(assets.length)}>
+      <Panel title="Todos os ativos" emptyMessage="Nenhum ativo cadastrado." {...panel(assets.length)}>
         <AssetsTable assets={assets} query={query} now={now} />
       </Panel>
     </div>

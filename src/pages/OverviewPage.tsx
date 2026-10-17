@@ -1,4 +1,4 @@
-import { IncidentsBySeverityChart, ThroughputChart } from '@/components/charts/lazy'
+import { AlertsBySeverityChart, ThroughputChart } from '@/components/charts/lazy'
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed'
 import { AlertsPanel } from '@/components/dashboard/AlertsPanel'
 import { AssetsTable } from '@/components/dashboard/AssetsTable'
@@ -43,10 +43,10 @@ export function OverviewPage() {
         </Panel>
 
         <Panel title="Alertas por severidade" emptyMessage="Nenhum alerta no período." {...panel(alerts.length)}>
-          <IncidentsBySeverityChart alerts={alerts} />
+          <AlertsBySeverityChart alerts={alerts} />
         </Panel>
 
-        <Panel title="Ativos" emptyMessage="Nenhum ativo no período." className="lg:col-span-2" {...panel(assets.length)}>
+        <Panel title="Ativos" emptyMessage="Nenhum ativo cadastrado." className="lg:col-span-2" {...panel(assets.length)}>
           <AssetsTable assets={assets} query={query} limit={8} now={now} />
         </Panel>
 

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { useFilters } from '@/hooks/filters'
 import { renderWithProviders } from '@/test/render'
 import type { Alert, Severity } from '@/types/dashboard'
-import { IncidentsBySeverityChart } from './IncidentsBySeverityChart'
+import { AlertsBySeverityChart } from './AlertsBySeverityChart'
 
 const alert = (n: number, severity: Severity): Alert => ({
   id: `AL-${n}`,
@@ -23,13 +23,13 @@ function SeverityProbe() {
 function setup(list: Alert[] = alerts) {
   return renderWithProviders(
     <>
-      <IncidentsBySeverityChart alerts={list} />
+      <AlertsBySeverityChart alerts={list} />
       <SeverityProbe />
     </>,
   )
 }
 
-describe('IncidentsBySeverityChart', () => {
+describe('AlertsBySeverityChart', () => {
   it('é uma figura nomeada', () => {
     setup()
     expect(screen.getByRole('figure', { name: 'Alertas por severidade' })).toBeInTheDocument()
@@ -87,5 +87,10 @@ describe('IncidentsBySeverityChart', () => {
     setup([])
     expect(screen.getByText('Nenhum alerta no período.')).toBeInTheDocument()
     expect(screen.queryByTestId('severity-chart')).not.toBeInTheDocument()
+  })
+
+  it('o gráfico conta todos os alertas do período, e diz isso', () => {
+    setup()
+    expect(screen.getByText('Todos os alertas do período, sem a busca.')).toBeInTheDocument()
   })
 })
