@@ -1,0 +1,36 @@
+# Dependências
+node_modules/
+.pnpm-store/
+
+# Build
+dist/
+dist-ssr/
+*.tsbuildinfo
+.vite/
+
+# Testes
+coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Variáveis de ambiente
+.env
+.env.*
+!.env.example
+
+# Editores e sistema
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Configuração local do Claude Code
+.claude/settings.local.json
