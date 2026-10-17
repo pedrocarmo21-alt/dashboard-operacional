@@ -12,7 +12,7 @@
 
 ## Restrições globais
 
-- Node.js 22 LTS (≥ 22.12) é pré-requisito, fixado em `.nvmrc`. O Node 20 está sem suporte desde abril de 2026. Nesta máquina, o Node é instalado via nvm.
+- Node.js 22 LTS (≥ 22.22, mínimo do React Router 8) é pré-requisito, fixado em `.nvmrc`. O Node 20 está sem suporte desde abril de 2026. Nesta máquina, o Node é instalado via nvm.
 - Só tema escuro: preto, grafite e tons de cinza. Verde e âmbar são os únicos acentos, usados para destacar informação. Vermelho aparece apenas na severidade crítica e, nos componentes shadcn, em campo de formulário inválido (`--destructive`). Não usar `variant="destructive"` em painéis de erro de carregamento.
 - Sem gradientes exagerados, sem decoração desnecessária, sem aparência de template genérico.
 - Nada de nomes, logos ou layouts copiados da Palantir ou da Anduril. Elas não aparecem na interface.
@@ -236,7 +236,7 @@ export interface DashboardData { systemStatus: SystemStatus; generatedAt: string
 - Produz também:
   - `SEVERITY_LABEL: Record<Severity, string>`, `ASSET_STATUS_LABEL`, `SYSTEM_STATUS_LABEL` e `PERIOD_LABEL: Record<Period, string>` (`'Últimas 24 h' | 'Últimos 7 dias' | 'Últimos 30 dias'`) em `labels.ts`
   - `REFERENCE_NOW = '2026-10-16T12:00:00Z'`
-  - `createMockData(period: Period, seed = 42): DashboardData` em `mock.ts`. A frota de ativos é a mesma em todos os períodos; alertas e eventos vêm ordenados do mais recente para o mais antigo.
+  - `createMockData(period: Period, seed = 42): DashboardData` em `mock.ts`. A frota de ativos é a mesma em todos os períodos; alertas e eventos vêm ordenados do mais recente para o mais antigo. Os ids de alerta incluem o período (`AL-24H-0001`), para que reconhecer um alerta de 24h não marque outro de 7d.
 
 - [ ] **Passo 1: Escrever os testes que falham**
 
@@ -338,6 +338,7 @@ A cada execução, `useAsync` cria um `AbortController` dentro de um `useEffect(
 ### Tarefa 5: Providers de filtros e dados, helper de teste e `Panel`
 
 **Arquivos:**
+- Instalar: `react-router` (o helper de teste usa `MemoryRouter`; a Tarefa 6 só adiciona as rotas)
 - Criar: `src/hooks/filters.tsx`, `src/hooks/dashboard-data.tsx`, `src/test/render.tsx`, `src/components/dashboard/Panel.tsx`
 - Teste: `src/hooks/filters.test.tsx`, `src/hooks/dashboard-data.test.tsx`, `src/components/dashboard/Panel.test.tsx`
 

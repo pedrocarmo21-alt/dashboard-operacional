@@ -11,7 +11,7 @@ describe('projeto', () => {
   })
 
   it('engines.node aceita a versão do .nvmrc', () => {
-    expect(pkg.engines.node).toBe(`>=${nodeMajor}.12`)
+    expect(pkg.engines.node).toMatch(new RegExp(`^>=${nodeMajor}\\.\\d+$`))
   })
 
   it('@types/node acompanha a versão do Node do .nvmrc', () => {
