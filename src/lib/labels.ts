@@ -1,4 +1,4 @@
-import type { AssetStatus, Period, Severity, SystemStatus } from '@/types/dashboard'
+import type { AssetStatus, AssetType, Period, Severity, SystemStatus } from '@/types/dashboard'
 
 export const SEVERITY_LABEL: Record<Severity, string> = {
   info: 'Info',
@@ -10,6 +10,12 @@ export const ASSET_STATUS_LABEL: Record<AssetStatus, string> = {
   online: 'Online',
   degraded: 'Degradado',
   offline: 'Offline',
+}
+
+export const ASSET_TYPE_LABEL: Record<AssetType, string> = {
+  sensor: 'Sensor',
+  veiculo: 'Veículo',
+  estacao: 'Estação',
 }
 
 export const SYSTEM_STATUS_LABEL: Record<SystemStatus, string> = {

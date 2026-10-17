@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ASSET_STATUS_LABEL, PERIOD_LABEL, SEVERITY_LABEL, SYSTEM_STATUS_LABEL } from './labels'
+import { ASSET_STATUS_LABEL, ASSET_TYPE_LABEL, PERIOD_LABEL, SEVERITY_LABEL, SYSTEM_STATUS_LABEL } from './labels'
 
 // Rótulos fixados nas Restrições globais de docs/plano.md.
 describe('rótulos', () => {
@@ -9,6 +9,10 @@ describe('rótulos', () => {
 
   it('status do ativo', () => {
     expect(ASSET_STATUS_LABEL).toEqual({ online: 'Online', degraded: 'Degradado', offline: 'Offline' })
+  })
+
+  it('tipo do ativo', () => {
+    expect(ASSET_TYPE_LABEL).toEqual({ sensor: 'Sensor', veiculo: 'Veículo', estacao: 'Estação' })
   })
 
   it('status do sistema', () => {

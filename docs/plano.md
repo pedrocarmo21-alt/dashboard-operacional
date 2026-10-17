@@ -626,7 +626,7 @@ await user.click(screen.getByRole('button', { name: 'Crítico: 2' }))
   - `type AssetSortKey = 'name' | 'status' | 'latencyMs' | 'lastSeen'`
   - `filterAssets(assets: Asset[], opts: { query: string; status: AssetStatus | 'all' }): Asset[]`. A busca olha `name`, `id`, `region` e `type`.
   - `sortAssets(assets: Asset[], key: AssetSortKey, dir: 'asc' | 'desc'): Asset[]`, sem mutar a entrada. Ordem de status: `offline` < `degraded` < `online` em `asc`.
-  - `AssetsTable({ assets, query, limit?, now? }: { assets: Asset[]; query: string; limit?: number; now?: Date })`
+  - `AssetsTable({ assets, query, limit?, now }: { assets: Asset[]; query: string; limit?: number; now: Date })`. `now` é obrigatório (o `generatedAt` dos dados): ler o relógio na renderização é impuro e daria o tempo errado com dados fictícios. O filtro de status é um `radiogroup` (não `Tabs`), com a contagem em cada opção; o padrão ordena por status, problemas primeiro. Sem cabeçalho fixo: o contêiner com `overflow-x-auto` impede o `sticky` em relação à página.
 
 - [ ] **Passo 1: Escrever os testes que falham**
 
