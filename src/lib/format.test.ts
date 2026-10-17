@@ -57,7 +57,7 @@ describe('formatMs', () => {
   })
 
   it('não separa número e unidade em quebra de linha', () => {
-    expect(formatMs(128)).toBe('128 ms')
+    expect(formatMs(128)).toBe('128\u00a0ms')
   })
 
   it('mostra travessão para NaN', () => {

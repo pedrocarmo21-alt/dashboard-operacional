@@ -10,6 +10,14 @@ describe('projeto', () => {
     expect(Object.keys(leftovers)).toEqual([])
   })
 
+  it('nenhum código-fonte tem espaço não separável literal (use \\u00a0)', () => {
+    const sources = import.meta.glob<string>('./**/*.{ts,tsx}', { query: '?raw', import: 'default', eager: true })
+    const offenders = Object.entries(sources)
+      .filter(([, source]) => source.includes('\u00a0'))
+      .map(([file]) => file)
+    expect(offenders).toEqual([])
+  })
+
   it('engines.node aceita a versão do .nvmrc', () => {
     expect(pkg.engines.node).toMatch(new RegExp(`^>=${nodeMajor}\\.\\d+$`))
   })

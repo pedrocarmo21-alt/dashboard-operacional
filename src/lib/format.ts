@@ -1,6 +1,6 @@
 const LOCALE = 'pt-BR'
 const EMPTY = '—'
-const NBSP = ' '
+const NBSP = '\u00a0'
 const MINUS = '−'
 
 const numberFormat = new Intl.NumberFormat(LOCALE)
