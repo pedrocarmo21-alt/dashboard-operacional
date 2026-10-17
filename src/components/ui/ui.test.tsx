@@ -25,7 +25,7 @@ describe('componentes shadcn (ajustes do projeto)', () => {
     act(() => {
       toast('Olá')
     })
-    expect(await screen.findByRole('region', { name: /^Notificações/ })).toBeInTheDocument()
+    expect(await screen.findByRole('region', { name: /^Avisos do sistema/ })).toBeInTheDocument()
     expect(document.querySelector('[data-sonner-toaster]')).toHaveAttribute('data-sonner-theme', 'dark')
     expect(screen.getByRole('button', { name: 'Fechar notificação' })).toBeInTheDocument()
   })

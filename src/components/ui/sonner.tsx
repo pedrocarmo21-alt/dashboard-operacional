@@ -7,7 +7,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme="dark"
-      containerAriaLabel="Notificações"
+      containerAriaLabel="Avisos do sistema"
       className="toaster group"
       icons={{
         success: (

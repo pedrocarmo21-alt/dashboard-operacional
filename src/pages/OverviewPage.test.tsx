@@ -1,4 +1,4 @@
-import { act, screen, waitFor, within } from '@testing-library/react'
+import { act, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { AppRoutes } from '@/App'
 import { createMockData } from '@/data/mock'
@@ -43,15 +43,23 @@ describe('OverviewPage', () => {
     expect(screen.getByRole('link', { name: 'Ver todos os 25 eventos' })).toBeInTheDocument()
   })
 
-  it('erro e "Tentar novamente" recuperam todos os painéis', async () => {
+  it('erro: um único aviso e um único "Tentar novamente", que recupera todos os painéis', async () => {
     const fetcher = vi.fn<Fetcher>().mockRejectedValueOnce(new Error('x')).mockImplementation(okFetcher)
     const { user } = renderWithProviders(<OverviewPage />, { fetcher })
-    const retry = await screen.findAllByRole('button', { name: 'Tentar novamente' })
-    expect(retry.length).toBe(REGIONS.length)
+    expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar os dados.')
+    expect(screen.getAllByRole('alert')).toHaveLength(1)
+    expect(screen.getAllByRole('button', { name: 'Tentar novamente' })).toHaveLength(1)
+    for (const name of REGIONS) expect(within(region(name)).getByText(/indisponíveis\.$/)).toBeInTheDocument()
 
-    await user.click(retry[0])
+    await user.click(screen.getByRole('button', { name: 'Tentar novamente' }))
     expect(await screen.findByText('Latência média')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Tentar novamente' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('carregando: um único anúncio para a página inteira', () => {
+    renderWithProviders(<OverviewPage />, { fetcher: () => new Promise(() => {}) })
+    expect(screen.getAllByRole('status')).toHaveLength(1)
+    expect(screen.getByRole('status')).toHaveTextContent('Carregando dados…')
   })
 
   it('dados vazios mostram o estado vazio de cada painel', async () => {
@@ -125,12 +133,14 @@ describe('OverviewPage', () => {
     expect(rows.every((r) => r.textContent?.includes('Estação'))).toBe(true)
   })
 
-  it('erro numa recarga aparece, mesmo com dados anteriores', async () => {
+  it('erro numa recarga avisa e mantém os dados anteriores na tela', async () => {
     const { fetcher, calls } = controlledFetcher()
     const { user } = renderWithProviders(<OverviewPage />, { fetcher })
     await act(async () => calls[0].resolve(createMockData('24h')))
     await user.click(screen.getByRole('radio', { name: 'Últimos 30 dias' }))
     await act(async () => calls.at(-1)!.reject(new Error('x')))
-    await waitFor(() => expect(within(region('Ativos')).getByRole('alert')).toBeInTheDocument())
+    expect(await screen.findByRole('alert')).toHaveTextContent('Mostrando os dados anteriores.')
+    expect(within(region('Ativos')).getByRole('table')).toBeInTheDocument()
+    expect(region('Ativos')).not.toHaveAttribute('aria-busy')
   })
 })

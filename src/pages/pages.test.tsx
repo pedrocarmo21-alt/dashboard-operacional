@@ -1,6 +1,8 @@
 import { screen, waitFor, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { AppRoutes } from '@/App'
+import type { Fetcher } from '@/hooks/dashboard-data'
+import { okFetcher } from '@/test/fetchers'
 import { renderWithProviders } from '@/test/render'
 
 describe.each([
@@ -54,5 +56,20 @@ describe('página de eventos', () => {
     const list = await screen.findByRole('list', { name: 'Eventos' })
     expect(within(list).getAllByRole('listitem')).toHaveLength(25)
     expect(screen.getByRole('radiogroup', { name: 'Período' })).toBeInTheDocument()
+  })
+})
+
+describe('erro na primeira carga, com o app inteiro', () => {
+  it('o status do sistema diz "Indisponível", não "Verificando…"', async () => {
+    renderWithProviders(<AppRoutes />, { fetcher: () => Promise.reject(new Error('x')) })
+    await screen.findByRole('alert')
+    expect(within(screen.getByTestId('system-status')).getByText('Indisponível')).toBeInTheDocument()
+  })
+
+  it('"Tentar novamente" leva o foco à área principal', async () => {
+    const fetcher = vi.fn<Fetcher>().mockRejectedValueOnce(new Error('x')).mockImplementation(okFetcher)
+    const { user } = renderWithProviders(<AppRoutes />, { fetcher })
+    await user.click(await screen.findByRole('button', { name: 'Tentar novamente' }))
+    expect(screen.getByRole('main')).toHaveFocus()
   })
 })

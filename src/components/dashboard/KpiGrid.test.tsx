@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { createMockData } from '@/data/mock'
 import { KpiGrid } from './KpiGrid'
 
@@ -18,11 +17,10 @@ describe('KpiGrid', () => {
     ])
   })
 
-  it('carregando mostra 4 esqueletos e anuncia uma vez', () => {
+  it('carregando mostra 4 esqueletos, sem anúncio próprio', () => {
     render(<KpiGrid kpis={[]} status="loading" />)
     expect(screen.getAllByTestId('kpi-skeleton')).toHaveLength(4)
-    expect(screen.getAllByRole('status')).toHaveLength(1)
-    expect(screen.getByRole('status')).toHaveTextContent('Carregando indicadores')
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Indicadores' })).toHaveAttribute('aria-busy', 'true')
   })
 
@@ -36,13 +34,18 @@ describe('KpiGrid', () => {
     expect(screen.getByText('Sem indicadores para o período.')).toBeInTheDocument()
   })
 
-  it('erro avisa e permite tentar de novo', async () => {
-    const user = userEvent.setup()
-    const onRetry = vi.fn<() => void>()
-    render(<KpiGrid kpis={[]} status="error" onRetry={onRetry} />)
-    expect(screen.getByRole('alert')).toHaveTextContent('Não foi possível carregar os indicadores.')
-    await user.click(screen.getByRole('button', { name: 'Tentar novamente' }))
-    expect(onRetry).toHaveBeenCalledOnce()
+  it('erro mostra texto estático, sem alerta nem botão', () => {
+    render(<KpiGrid kpis={[]} status="error" />)
+    expect(screen.getByText('Indicadores indisponíveis.')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  })
+
+  it('desatualizado mantém os KPIs esmaecidos, sem marcar como ocupado', () => {
+    render(<KpiGrid kpis={kpis} status="success" stale />)
+    expect(screen.getAllByRole('term')).toHaveLength(4)
+    expect(screen.getByTestId('kpi-grid')).toHaveClass('opacity-50')
+    expect(screen.getByRole('region', { name: 'Indicadores' })).not.toHaveAttribute('aria-busy')
   })
 
   it('recarregando mantém os KPIs esmaecidos, sem esqueleto', () => {

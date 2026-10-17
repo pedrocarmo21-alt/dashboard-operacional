@@ -22,24 +22,27 @@ describe('derivePanelStatus', () => {
 
 describe('panelState', () => {
   it('primeira carga, sem dados: esqueleto', () => {
-    expect(panelState('loading', false, 0)).toEqual({ status: 'loading', refreshing: false })
+    expect(panelState('loading', false, 0)).toEqual({ status: 'loading', refreshing: false, stale: false })
   })
 
   it('recarga com dados anteriores: mostra o conteúdo, marcado como recarregando', () => {
-    expect(panelState('loading', true, 5)).toEqual({ status: 'success', refreshing: true })
+    expect(panelState('loading', true, 5)).toEqual({ status: 'success', refreshing: true, stale: false })
   })
 
   it('recarga com dados anteriores vazios: vazio, recarregando', () => {
-    expect(panelState('loading', true, 0)).toEqual({ status: 'empty', refreshing: true })
+    expect(panelState('loading', true, 0)).toEqual({ status: 'empty', refreshing: true, stale: false })
   })
 
   it('sucesso', () => {
-    expect(panelState('success', true, 3)).toEqual({ status: 'success', refreshing: false })
-    expect(panelState('success', true, 0)).toEqual({ status: 'empty', refreshing: false })
+    expect(panelState('success', true, 3)).toEqual({ status: 'success', refreshing: false, stale: false })
+    expect(panelState('success', true, 0)).toEqual({ status: 'empty', refreshing: false, stale: false })
   })
 
-  it('erro sempre aparece, mesmo com dados anteriores', () => {
-    expect(panelState('error', true, 3)).toEqual({ status: 'error', refreshing: false })
-    expect(panelState('error', false, 0)).toEqual({ status: 'error', refreshing: false })
+  it('erro na primeira carga: erro', () => {
+    expect(panelState('error', false, 0)).toEqual({ status: 'error', refreshing: false, stale: false })
+  })
+
+  it('erro numa recarga: mantém o conteúdo anterior, marcado como desatualizado', () => {
+    expect(panelState('error', true, 3)).toEqual({ status: 'success', refreshing: false, stale: true })
   })
 })

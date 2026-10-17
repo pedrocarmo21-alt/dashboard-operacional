@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { Panel } from './Panel'
 
 describe('Panel', () => {
@@ -24,15 +23,24 @@ describe('Panel', () => {
     expect(screen.getByRole('region', { name: 'Ativos' })).not.toHaveAttribute('aria-busy')
   })
 
-  it('carregando anuncia o estado e esconde o conteúdo', () => {
+  it('carregando marca a região como ocupada, mostra esqueleto e esconde o conteúdo', () => {
     render(
       <Panel title="Ativos" status="loading">
         conteúdo
       </Panel>,
     )
-    expect(screen.getByRole('status')).toHaveTextContent('Carregando')
     expect(screen.getByRole('region', { name: 'Ativos' })).toHaveAttribute('aria-busy', 'true')
+    expect(screen.getByTestId('panel-skeleton')).toBeInTheDocument()
     expect(screen.queryByText('conteúdo')).not.toBeInTheDocument()
+  })
+
+  it('carregando não faz anúncio próprio (a página anuncia uma vez só)', () => {
+    render(
+      <Panel title="Ativos" status="loading">
+        conteúdo
+      </Panel>,
+    )
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 
   it('vazio mostra a mensagem informada', () => {
@@ -54,46 +62,36 @@ describe('Panel', () => {
     expect(screen.getByText('Nenhum dado para exibir.')).toBeInTheDocument()
   })
 
-  it('erro anuncia a falha e "Tentar novamente" chama onRetry', async () => {
-    const user = userEvent.setup()
-    const onRetry = vi.fn<() => void>()
-    render(
-      <Panel title="Ativos" status="error" onRetry={onRetry}>
-        conteúdo
-      </Panel>,
-    )
-    expect(screen.getByRole('alert')).toHaveTextContent('Não foi possível carregar')
-    expect(screen.queryByText('conteúdo')).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Tentar novamente' }))
-    expect(onRetry).toHaveBeenCalledOnce()
-  })
-
-  it('erro sem onRetry não mostra o botão', () => {
+  it('erro mostra texto estático, sem alerta nem botão (a página tem o aviso único)', () => {
     render(
       <Panel title="Ativos" status="error">
         conteúdo
       </Panel>,
     )
-    expect(screen.queryByRole('button', { name: 'Tentar novamente' })).not.toBeInTheDocument()
+    expect(screen.getByText('Dados indisponíveis.')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(screen.queryByText('conteúdo')).not.toBeInTheDocument()
   })
 
-  it('mostra descrição e ações no cabeçalho', () => {
+  it('desatualizado mantém o conteúdo esmaecido, sem marcar como ocupado', () => {
     render(
-      <Panel title="Ativos" description="Últimas 24 h" actions={<button type="button">Exportar</button>} status="success">
+      <Panel title="Ativos" status="success" stale>
+        conteúdo
+      </Panel>,
+    )
+    expect(screen.getByText('conteúdo')).toBeInTheDocument()
+    expect(screen.getByTestId('panel-body')).toHaveClass('opacity-50')
+    expect(screen.getByRole('region', { name: 'Ativos' })).not.toHaveAttribute('aria-busy')
+  })
+
+  it('mostra a descrição no cabeçalho', () => {
+    render(
+      <Panel title="Ativos" description="Últimas 24 h" status="success">
         conteúdo
       </Panel>,
     )
     expect(screen.getByText('Últimas 24 h')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Exportar' })).toBeInTheDocument()
-  })
-
-  it('as ações continuam disponíveis enquanto carrega', () => {
-    render(
-      <Panel title="Ativos" actions={<button type="button">Exportar</button>} status="loading">
-        conteúdo
-      </Panel>,
-    )
-    expect(screen.getByRole('button', { name: 'Exportar' })).toBeInTheDocument()
   })
 
   it('dois painéis com o mesmo título têm ids de título distintos', () => {

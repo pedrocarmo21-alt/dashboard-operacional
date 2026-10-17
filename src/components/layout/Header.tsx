@@ -13,7 +13,7 @@ const TYPING_TARGET = 'input, textarea, select, [contenteditable="true"]'
 /** Barra superior: busca global (atalho "/"), status do sistema, notificações e perfil. */
 export function Header() {
   const { query, setQuery } = useFilters()
-  const { data } = useDashboardData()
+  const { data, status } = useDashboardData()
   const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export function Header() {
         </kbd>
       </div>
       <div className="ml-auto flex items-center gap-1 md:gap-3">
-        <SystemStatusBadge status={data?.systemStatus} />
+        <SystemStatusBadge status={data?.systemStatus} unavailable={status === 'error' && !data} />
         <NotificationsMenu />
         <ProfileMenu />
       </div>

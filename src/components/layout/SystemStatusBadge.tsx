@@ -11,7 +11,7 @@ const DOT = {
 }
 
 /** Ponto colorido + rótulo; em telas estreitas o rótulo fica só para leitores de tela. */
-export function SystemStatusBadge({ status }: { status: SystemStatus | undefined }) {
+export function SystemStatusBadge({ status, unavailable = false }: { status: SystemStatus | undefined; unavailable?: boolean }) {
   const signal = status ? SIGNAL[status] : 'unknown'
   return (
     <div
@@ -21,7 +21,7 @@ export function SystemStatusBadge({ status }: { status: SystemStatus | undefined
     >
       <span aria-hidden="true" className={cn('size-1.5 shrink-0 rounded-full', DOT[signal])} />
       <span className="sr-only">Status do sistema: </span>
-      <span className="max-sm:sr-only">{status ? SYSTEM_STATUS_LABEL[status] : 'Verificando…'}</span>
+      <span className="max-sm:sr-only">{status ? SYSTEM_STATUS_LABEL[status] : unavailable ? 'Indisponível' : 'Verificando…'}</span>
     </div>
   )
 }

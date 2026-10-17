@@ -23,4 +23,10 @@ describe('SystemStatusBadge', () => {
     render(<SystemStatusBadge status="degraded" />)
     expect(screen.getByTestId('system-status')).toHaveTextContent('Status do sistema: Degradado')
   })
+
+  it('se os dados não puderam ser carregados, diz "Indisponível"', () => {
+    render(<SystemStatusBadge status={undefined} unavailable />)
+    expect(screen.getByText('Indisponível')).toBeInTheDocument()
+    expect(screen.getByTestId('system-status')).toHaveAttribute('data-signal', 'unknown')
+  })
 })

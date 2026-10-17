@@ -10,10 +10,7 @@ const IncidentsBySeverityChartImpl = lazy(() =>
 
 function ChartFallback({ height }: { height: string }) {
   return (
-    <div role="status">
-      <span className="sr-only">Carregando gráfico…</span>
-      <Skeleton aria-hidden="true" className={`w-full ${height}`} />
-    </div>
+    <Skeleton data-testid="chart-skeleton" aria-hidden="true" className={`w-full ${height}`} />
   )
 }
 
