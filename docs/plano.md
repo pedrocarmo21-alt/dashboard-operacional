@@ -223,6 +223,7 @@ export type AssetStatus = 'online' | 'degraded' | 'offline'
 export type AssetType = 'sensor' | 'veiculo' | 'estacao'
 export type SystemStatus = 'operational' | 'degraded' | 'outage'
 export type AsyncStatus = 'loading' | 'success' | 'empty' | 'error'
+export type RequestStatus = Exclude<AsyncStatus, 'empty'>
 export type KpiId = 'assetsOnline' | 'openIncidents' | 'avgLatency' | 'ingestRate'
 export interface Kpi { id: KpiId; label: string; value: number; unit: 'count' | 'ms' | 'eventsPerSec'; delta: number; goodWhen: 'up' | 'down' }
 export interface ThroughputPoint { timestamp: string; eventsPerSec: number }
@@ -289,8 +290,8 @@ PRNG `mulberry32(seed)` local em `mock.ts`, com todos os timestamps relativos a 
   - `type SimulationMode = 'normal' | 'erro' | 'vazio' | 'lento'`
   - `getSimulationMode(search: string): SimulationMode`, que lê `?simular=`
   - `fetchDashboard(period: Period, signal?: AbortSignal, mode: SimulationMode = 'normal'): Promise<DashboardData>`, com latência de 400 ms (2000 ms no modo `lento`)
-  - `useAsync<T>(fn: (signal: AbortSignal) => Promise<T>): { status: 'loading' | 'success' | 'error'; data: T | undefined; error: Error | undefined; retry: () => void }`, que roda de novo quando a identidade de `fn` muda
-  - `derivePanelStatus(status: 'loading' | 'success' | 'error', count: number): AsyncStatus`
+  - `useAsync<T>(fn: (signal: AbortSignal) => Promise<T>): { status: RequestStatus; data: T | undefined; error: Error | undefined; retry: () => void }`, que roda de novo quando a identidade de `fn` muda. Durante uma nova carga, `data` mantém o último resultado bem-sucedido.
+  - `derivePanelStatus(status: RequestStatus, count: number): AsyncStatus`
 
 - [ ] **Passo 1: Escrever os testes que falham** (com `vi.useFakeTimers()` na API)
 
