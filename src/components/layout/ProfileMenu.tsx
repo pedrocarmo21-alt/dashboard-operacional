@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
@@ -34,18 +35,15 @@ export function ProfileMenu() {
           <span className="font-mono text-xs font-normal text-muted-foreground">Turno A</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {/* Um menu só pode conter itens: os atalhos são itens desabilitados, com a tecla ao lado. */}
         <DropdownMenuGroup>
           <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Atalhos de teclado</DropdownMenuLabel>
-          <dl className="px-2 pb-1.5 text-xs">
-            {SHORTCUTS.map(([action, key]) => (
-              <div key={action} className="flex items-center justify-between py-0.5">
-                <dt>{action}</dt>
-                <dd>
-                  <kbd className="rounded-sm border px-1 font-mono text-[11px] text-muted-foreground">{key}</kbd>
-                </dd>
-              </div>
-            ))}
-          </dl>
+          {SHORTCUTS.map(([action, key]) => (
+            <DropdownMenuItem key={action} disabled className="text-xs data-disabled:opacity-100">
+              {action}
+              <DropdownMenuShortcut className="font-mono">{key}</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          ))}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => toast('Demonstração: autenticação não configurada.')}>

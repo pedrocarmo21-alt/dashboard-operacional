@@ -1,5 +1,5 @@
 import { Bell } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -21,6 +21,7 @@ function triggerLabel(pending: number | undefined): string {
 /** Sino do header: alertas pendentes mais recentes, com reconhecimento rápido. */
 export function NotificationsMenu() {
   const [open, setOpen] = useState(false)
+  const titleId = useId()
   const { status, data, acknowledgeAlert } = useDashboardData()
 
   const pending = useMemo(
@@ -45,8 +46,8 @@ export function NotificationsMenu() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-80 gap-0 p-0">
-        <p className="border-b px-3 py-2 text-xs font-medium tracking-wider text-muted-foreground uppercase">
+      <PopoverContent align="end" aria-labelledby={titleId} className="w-80 gap-0 p-0">
+        <p id={titleId} className="border-b px-3 py-2 text-xs font-medium tracking-wider text-muted-foreground uppercase">
           Notificações
         </p>
         <div className="max-h-80 overflow-y-auto">
