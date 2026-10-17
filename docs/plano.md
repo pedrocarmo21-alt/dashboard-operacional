@@ -164,9 +164,9 @@ Rodar: `npm run lint && npm run typecheck && npm test -- --run && npm run build`
   - `formatMs(n: number): string`
   - `formatPercentDelta(d: number): string`
   - `formatRelativeTime(iso: string, now: Date): string`
-  - `formatDateTime(iso: string): string`
+  - `formatDateTime(iso: string, timeZone?: string): string` (sem `timeZone`, usa o fuso do navegador; os testes passam `'UTC'`)
   - `normalizeText(s: string): string`
-  - `matchesQuery(fields: string[], query: string): boolean`
+  - `matchesQuery(fields: string[], query: string): boolean` (cada palavra da busca precisa casar em algum campo)
 
 - [ ] **Passo 1: Escrever os testes que falham**
 
