@@ -123,6 +123,19 @@ describe.each(PERIODS)('consistência interna (%s)', (period) => {
     expect(d.systemStatus).toBe(pendingCritical ? 'degraded' : 'operational')
   })
 
+  it('alertas críticos e de aviso apontam para ativos com problema', () => {
+    const byId = new Map(d.assets.map((a) => [a.id, a]))
+    const serious = d.alerts.filter((a) => a.severity !== 'info')
+    expect(serious.every((a) => byId.get(a.assetId)!.status !== 'online')).toBe(true)
+  })
+
+  it('eventos críticos e de aviso citam ativos com problema', () => {
+    const troubled = d.assets.filter((a) => a.status !== 'online').map((a) => a.name)
+    const serious = d.events.filter((e) => e.severity !== 'info')
+    expect(serious.length).toBeGreaterThan(0)
+    expect(serious.every((e) => troubled.some((name) => e.message.includes(name)))).toBe(true)
+  })
+
   it('ativos têm latência positiva e foram vistos até o instante de referência', () => {
     expect(d.assets.every((a) => Number.isFinite(a.latencyMs) && a.latencyMs > 0)).toBe(true)
     expect(d.assets.every((a) => Date.parse(a.lastSeen) <= now)).toBe(true)

@@ -155,7 +155,8 @@ function createAlerts(rng: Rng, period: Period, now: number, durationMs: number,
       id: `AL-${period.toUpperCase()}-${pad(i + 1, 4)}`,
       title: pick(rng, ALERT_TITLES[severity]),
       severity,
-      assetId: (severity === 'critical' ? pick(rng, troubled) : pick(rng, assets)).id,
+      // Críticos e avisos (sem resposta, latência alta...) só fazem sentido em ativos com problema.
+      assetId: (severity === 'info' ? pick(rng, assets) : pick(rng, troubled)).id,
       createdAt: iso(withinPeriod(rng, now, durationMs)),
       acknowledged: severity === 'critical' ? criticalsHandled : rng() < 0.4,
     }))
@@ -163,10 +164,11 @@ function createAlerts(rng: Rng, period: Period, now: number, durationMs: number,
 }
 
 function createEvents(rng: Rng, now: number, durationMs: number, assets: Asset[]): ActivityEvent[] {
+  const troubled = assets.filter((a) => a.status !== 'online')
   return Array.from({ length: EVENT_COUNT }, (_, i) => {
     const roll = rng()
     const severity: Severity = roll < 0.7 ? 'info' : roll < 0.92 ? 'warning' : 'critical'
-    const asset = pick(rng, assets)
+    const asset = severity === 'info' ? pick(rng, assets) : pick(rng, troubled)
     return {
       id: `EV-${pad(i + 1, 4)}`,
       message: pick(rng, EVENT_MESSAGES[severity])(asset.name),

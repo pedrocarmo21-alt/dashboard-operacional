@@ -85,6 +85,17 @@ describe('useDashboardData', () => {
       expect(pendingAlerts(result.current.dash.data)).toBe(before - 1)
     })
 
+    it('recalcula a variação do KPI contra o mesmo valor do período anterior', async () => {
+      const { result } = await loaded()
+      const before = result.current.dash.data!.kpis.find((k) => k.id === 'pendingAlerts')!
+      const previous = before.value / (1 + before.delta / 100)
+      const pending = result.current.dash.data!.alerts.find((a) => !a.acknowledged)!
+      act(() => result.current.dash.acknowledgeAlert(pending.id))
+      const after = result.current.dash.data!.kpis.find((k) => k.id === 'pendingAlerts')!
+      expect(after.delta).toBe(Math.round(((after.value - previous) / previous) * 1000) / 10)
+      expect(after.delta).toBeLessThan(before.delta)
+    })
+
     it('reconhecer todos os críticos deixa o sistema operacional', async () => {
       const { result } = await loaded()
       const criticals = result.current.dash.data!.alerts.filter((a) => a.severity === 'critical' && !a.acknowledged)

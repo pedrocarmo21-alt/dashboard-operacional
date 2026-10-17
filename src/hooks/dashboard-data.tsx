@@ -1,6 +1,6 @@
 import { createContext, type ReactNode, use, useCallback, useMemo, useState } from 'react'
 import { fetchDashboard, getSimulationMode } from '@/data/api'
-import type { DashboardData, Period, RequestStatus } from '@/types/dashboard'
+import type { DashboardData, Kpi, Period, RequestStatus } from '@/types/dashboard'
 import { useFilters } from './filters'
 import { useAsync } from './useAsync'
 
@@ -20,6 +20,14 @@ const DashboardDataContext = createContext<DashboardDataState | null>(null)
 const defaultFetcher: Fetcher = (period, signal) =>
   fetchDashboard(period, signal, getSimulationMode(window.location.search))
 
+// Novo valor de um KPI mantendo a mesma base de comparação: o valor do período anterior
+// é recuperado de value / (1 + delta/100) e a variação é recalculada contra ele.
+function withValue(kpi: Kpi, value: number): Kpi {
+  const previous = kpi.value / (1 + kpi.delta / 100)
+  if (!Number.isFinite(previous) || previous <= 0) return { ...kpi, value }
+  return { ...kpi, value, delta: Math.round(((value - previous) / previous) * 1000) / 10 }
+}
+
 // Reconhecer um alerta muda também o KPI de alertas pendentes e o status do sistema.
 function applyAcknowledged(data: DashboardData, acknowledged: ReadonlySet<string>): DashboardData {
   if (!data.alerts.some((a) => !a.acknowledged && acknowledged.has(a.id))) return data
@@ -29,7 +37,7 @@ function applyAcknowledged(data: DashboardData, acknowledged: ReadonlySet<string
   return {
     ...data,
     alerts,
-    kpis: data.kpis.map((k) => (k.id === 'pendingAlerts' ? { ...k, value: open } : k)),
+    kpis: data.kpis.map((k) => (k.id === 'pendingAlerts' ? withValue(k, open) : k)),
     systemStatus: data.systemStatus === 'outage' ? 'outage' : pendingCritical ? 'degraded' : 'operational',
   }
 }
