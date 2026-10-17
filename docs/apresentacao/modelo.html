@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Dashboard Operacional — Apresentação do projeto</title>
+<style>
+/* As fontes são as mesmas do app (Inter e JetBrains Mono, via @fontsource), embutidas pelo gerador. */
+{{fonts}}
+
+:root {
+  /* Identidade do app (src/index.css) */
+  --bg: #0a0a0b;
+  --card: #111113;
+  --muted: #1a1a1d;
+  --border-dark: #26262b;
+  --fg-dark: #e4e4e7;
+  --muted-fg-dark: #8b8b94;
+  --ok: #3ddc84;
+  --warn: #f5a623;
+  --critical: #ef4444;
+  /* Páginas de leitura: papel claro, mesmos acentos em tons legíveis sobre branco */
+  --paper: #ffffff;
+  --ink: #16161a;
+  --ink-2: #4a4a55;
+  --ink-3: #74747f;
+  --line: #e4e4e7;
+  --soft: #f4f4f5;
+  --ok-ink: #11733f;
+  --warn-ink: #9a5b00;
+  --critical-ink: #b42323;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+@page { size: A4; margin: 0; }
+html, body { background: var(--paper); }
+body {
+  font-family: 'Inter Variable', sans-serif;
+  color: var(--ink);
+  font-size: 10pt;
+  line-height: 1.55;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  font-feature-settings: 'cv11', 'ss01';
+}
+.mono { font-family: 'JetBrains Mono Variable', monospace; }
+
+.page {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  padding: 20mm 18mm 22mm;
+  overflow: hidden;
+  page-break-after: always;
+  break-after: page;
+  display: flex;
+  flex-direction: column;
+}
+.page:last-child { page-break-after: auto; break-after: auto; }
+
+/* Rodapé de cada página de conteúdo */
+.footer {
+  position: absolute;
+  left: 18mm; right: 18mm; bottom: 10mm;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: 'JetBrains Mono Variable', monospace;
+  font-size: 7.5pt; color: var(--ink-3);
+  border-top: 1px solid var(--line);
+  padding-top: 3mm;
+  letter-spacing: 0.04em;
+}
+.footer .brand { display: flex; align-items: center; gap: 2mm; text-transform: uppercase; }
+
+/* ---------- Capa ---------- */
+.cover {
+  background: var(--bg);
+  color: var(--fg-dark);
+  padding: 22mm 20mm 18mm;
+}
+.cover .top { display: flex; justify-content: space-between; align-items: center; }
+.logo { display: flex; align-items: center; gap: 3mm; font-weight: 600; font-size: 8.5pt; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.25; }
+.logo svg { flex-shrink: 0; }
+.cover .tag { font-family: 'JetBrains Mono Variable', monospace; font-size: 7.5pt; color: var(--muted-fg-dark); letter-spacing: 0.08em; text-transform: uppercase; display: flex; align-items: center; gap: 2mm; }
+.dot { display: inline-block; width: 1.6mm; height: 1.6mm; border-radius: 50%; background: var(--ok); }
+.dot.warn { background: var(--warn); }
+.dot.crit { background: var(--critical); }
+.cover h1 { font-size: 40pt; font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; margin-top: 34mm; }
+.cover h1 span { color: var(--muted-fg-dark); font-weight: 400; }
+.cover .lead { font-size: 12.5pt; color: #b9b9c2; max-width: 150mm; margin-top: 7mm; line-height: 1.5; }
+.cover .rule { margin-top: 10mm; height: 1px; background: var(--border-dark); position: relative; }
+.cover .rule::before { content: ''; position: absolute; left: 0; top: -0.5px; width: 24mm; height: 2px; background: var(--ok); }
+.cover .shot { margin-top: 12mm; border: 1px solid var(--border-dark); border-radius: 2mm; overflow: hidden; }
+.cover .shot img { display: block; width: 100%; }
+.cover .meta { margin-top: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6mm; font-size: 8pt; }
+.cover .meta dt { font-family: 'JetBrains Mono Variable', monospace; font-size: 6.8pt; color: var(--muted-fg-dark); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1mm; }
+.cover .meta dd { color: var(--fg-dark); }
+
+/* ---------- Títulos ---------- */
+.eyebrow {
+  font-family: 'JetBrains Mono Variable', monospace;
+  font-size: 7.5pt; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ok-ink); display: flex; align-items: center; gap: 2.5mm;
+}
+.eyebrow::before { content: ''; width: 6mm; height: 2px; background: var(--ok); }
+h2 { font-size: 21pt; font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin: 2.5mm 0 3mm; }
+h3 { font-size: 11.5pt; font-weight: 600; margin: 6mm 0 2mm; letter-spacing: -0.005em; }
+h2 + .intro { font-size: 11pt; color: var(--ink-2); max-width: 165mm; margin-bottom: 4mm; }
+p { margin-bottom: 2.6mm; }
+p.muted, .muted { color: var(--ink-2); }
+.small { font-size: 8.5pt; }
+.section + .section { margin-top: 9mm; }
+strong { font-weight: 600; }
+code, .code {
+  font-family: 'JetBrains Mono Variable', monospace;
+  font-size: 0.86em;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 1mm;
+  padding: 0 1mm;
+}
+
+/* ---------- Listas ---------- */
+ul.list { list-style: none; margin: 1mm 0 3mm; }
+ul.list li { position: relative; padding-left: 5mm; margin-bottom: 1.6mm; }
+ul.list li::before { content: ''; position: absolute; left: 0.6mm; top: 2.15mm; width: 1.5mm; height: 1.5mm; background: var(--ink); border-radius: 0.3mm; }
+ul.list.ok li::before { background: var(--ok); }
+ul.list.warn li::before { background: var(--warn); }
+
+/* ---------- Sumário ---------- */
+.toc { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10mm; margin-top: 4mm; }
+.toc a { display: flex; align-items: baseline; gap: 3mm; padding: 2.4mm 0; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; font-size: 10pt; }
+.toc .n { font-family: 'JetBrains Mono Variable', monospace; font-size: 8pt; color: var(--ok-ink); width: 6mm; }
+.toc .pg { margin-left: auto; font-family: 'JetBrains Mono Variable', monospace; font-size: 8pt; color: var(--ink-3); }
+
+/* ---------- Cartões e números ---------- */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin: 4mm 0 2mm; }
+.stat { border: 1px solid var(--line); border-radius: 1.5mm; padding: 3.5mm 4mm; }
+.stat .label { font-family: 'JetBrains Mono Variable', monospace; font-size: 6.6pt; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.stat .value { font-family: 'JetBrains Mono Variable', monospace; font-size: 18pt; font-weight: 500; margin-top: 1mm; line-height: 1.1; }
+.stat .hint { font-size: 7.5pt; color: var(--ink-2); margin-top: 1mm; }
+
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-top: 3mm; }
+.cards.three { grid-template-columns: repeat(3, 1fr); }
+.card { border: 1px solid var(--line); border-radius: 1.5mm; padding: 4.5mm 5mm; background: var(--paper); }
+.card h4 { font-size: 10pt; font-weight: 600; margin-bottom: 1.5mm; display: flex; align-items: center; gap: 2mm; }
+.card p { font-size: 8.8pt; color: var(--ink-2); margin: 0; }
+.card .k { font-family: 'JetBrains Mono Variable', monospace; font-size: 7pt; color: var(--ok-ink); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1.5mm; }
+.card.accent { border-left: 2px solid var(--ok); }
+.card.accent-warn { border-left: 2px solid var(--warn); }
+.card.dark { background: var(--card); border-color: var(--border-dark); color: var(--fg-dark); }
+.card.dark p { color: #b9b9c2; }
+
+.callout { border: 1px solid var(--line); border-left: 2px solid var(--warn); background: #fffaf0; border-radius: 1.5mm; padding: 3.5mm 4.5mm; font-size: 8.8pt; color: var(--ink-2); margin-top: 4mm; }
+.callout strong { color: var(--ink); }
+.callout.ok { border-left-color: var(--ok); background: #f3fbf6; }
+
+/* ---------- Tabelas ---------- */
+table { width: 100%; border-collapse: collapse; font-size: 8.6pt; margin-top: 2mm; }
+th { text-align: left; font-family: 'JetBrains Mono Variable', monospace; font-weight: 500; font-size: 6.8pt; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding: 2mm 2.5mm; border-bottom: 1px solid var(--ink); }
+td { padding: 2.3mm 2.5mm; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink-2); }
+td:first-child { color: var(--ink); font-weight: 500; }
+tr { break-inside: avoid; }
+table.compact td { padding-top: 1.6mm; padding-bottom: 1.6mm; }
+td .pill { display: inline-block; font-family: 'JetBrains Mono Variable', monospace; font-size: 6.6pt; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.3mm 1.6mm; border-radius: 0.8mm; border: 1px solid var(--line); color: var(--ink-2); white-space: nowrap; }
+
+/* ---------- Capturas de tela ---------- */
+figure { margin: 3mm 0 0; }
+.frame { border: 1px solid var(--border-dark); background: var(--bg); border-radius: 1.5mm; overflow: hidden; }
+.frame img { display: block; width: 100%; }
+figcaption { font-size: 7.8pt; color: var(--ink-3); margin-top: 1.8mm; display: flex; gap: 2mm; }
+figcaption b { font-family: 'JetBrains Mono Variable', monospace; font-weight: 500; color: var(--ink-2); letter-spacing: 0.06em; text-transform: uppercase; font-size: 6.8pt; padding-top: 0.3mm; white-space: nowrap; }
+.shots { display: grid; gap: 4mm; }
+.shots.two { grid-template-columns: 1fr 1fr; }
+.shots.three { grid-template-columns: repeat(3, 1fr); }
+.shots.mobile { grid-template-columns: 52mm 1fr; align-items: start; }
+
+/* ---------- Diagramas ---------- */
+.diagram { border: 1px solid var(--line); border-radius: 1.5mm; padding: 5mm; background: #fbfbfb; margin-top: 3mm; }
+.diagram .title { font-family: 'JetBrains Mono Variable', monospace; font-size: 6.8pt; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 3.5mm; }
+
+/* Camadas aninhadas */
+.layer { border: 1px solid #cfcfd6; border-radius: 1.2mm; padding: 2.6mm 3.2mm 3.2mm; background: var(--paper); }
+.layer + .layer { margin-top: 2mm; }
+.layer > .layer { margin-top: 2.4mm; }
+.layer .lh { display: flex; align-items: baseline; gap: 2.5mm; font-size: 8.8pt; font-weight: 600; }
+.layer .lh .mono { font-weight: 500; font-size: 7pt; color: var(--ok-ink); }
+.layer .ld { font-size: 7.8pt; color: var(--ink-2); margin-top: 0.4mm; }
+.layer.l2 { background: #fafafa; }
+.layer.l3 { background: #f5f5f6; }
+.layer.l4 { background: #efeff1; }
+.layer.dark { background: var(--card); border-color: var(--border-dark); color: var(--fg-dark); }
+.layer.dark .ld { color: #b0b0b9; }
+.layer.dark .lh .mono { color: var(--ok); }
+.row { display: flex; gap: 2mm; margin-top: 2.4mm; }
+.row > * { flex: 1; }
+.chip { border: 1px solid var(--border-dark); background: var(--muted); border-radius: 1mm; padding: 1.8mm 2.2mm; font-size: 7.6pt; color: var(--fg-dark); }
+.chip .mono { display: block; font-size: 6.4pt; color: var(--muted-fg-dark); margin-top: 0.4mm; }
+.chip.light { background: var(--paper); border-color: #cfcfd6; color: var(--ink); }
+.chip.light .mono { color: var(--ink-3); }
+
+/* Fluxo em etapas */
+.flow { display: flex; align-items: stretch; gap: 0; }
+.step { flex: 1; border: 1px solid #cfcfd6; border-radius: 1.2mm; padding: 3mm; background: var(--paper); position: relative; }
+.step .n { font-family: 'JetBrains Mono Variable', monospace; font-size: 6.8pt; color: var(--ok-ink); letter-spacing: 0.08em; }
+.step .t { font-size: 8.6pt; font-weight: 600; margin: 0.8mm 0 0.8mm; line-height: 1.3; }
+.step .d { font-size: 7.4pt; color: var(--ink-2); line-height: 1.4; }
+.arrow { width: 6mm; display: flex; align-items: center; justify-content: center; color: var(--ink-3); flex-shrink: 0; }
+.flow.vertical { flex-direction: column; }
+.flow.vertical .arrow { width: auto; height: 5mm; }
+
+/* Estados */
+.states { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5mm; }
+.state { border: 1px solid var(--border-dark); background: var(--card); border-radius: 1.2mm; padding: 3mm; color: var(--fg-dark); }
+.state .sh { display: flex; align-items: center; gap: 2mm; font-size: 8.4pt; font-weight: 600; }
+.state .sd { font-size: 7.3pt; color: #b0b0b9; margin-top: 1mm; line-height: 1.4; }
+.skel { height: 1.4mm; background: #26262b; border-radius: 0.5mm; margin-top: 1.2mm; }
+
+.staterows { display: flex; flex-direction: column; gap: 4.5mm; margin-top: 2mm; }
+.staterow { display: grid; grid-template-columns: 96mm 1fr; gap: 6mm; align-items: center; margin: 0; }
+.staterow figcaption { display: block; margin: 0; font-size: 8.8pt; color: var(--ink-2); }
+.staterow figcaption b { display: block; font-size: 7.2pt; color: var(--ok-ink); margin-bottom: 1.5mm; }
+.staterow figcaption p { margin: 0; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
+.spacer { flex: 1; }
+</style>
+</head>
+<body>
+
+<!-- ===================================================== 1. CAPA -->
+<section class="page cover">
+  <div class="top">
+    <div class="logo">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3ddc84" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 20v-4M10 20v-8M15 20v-12M20 20V4"/></svg>
+      <span>Dashboard<br>Operacional</span>
+    </div>
+    <div class="tag"><span class="dot"></span> Apresentação do projeto</div>
+  </div>
+
+  <h1>Dashboard<br>Operacional <span>—</span><br><span>visão única da operação</span></h1>
+  <p class="lead">Painel web de monitoramento para acompanhar, numa só tela, a saúde de uma frota de sensores, veículos e estações: indicadores, gráficos, ativos, alertas e eventos, com tema escuro e foco em dados.</p>
+  <div class="rule"></div>
+
+  <div class="shot"><img src="{{shot:overview-hero}}" alt=""></div>
+
+  <dl class="meta">
+    <div><dt>Tipo</dt><dd>Aplicação web (SPA)</dd></div>
+    <div><dt>Stack</dt><dd>React · TypeScript · Vite</dd></div>
+    <div><dt>Situação</dt><dd>Protótipo funcional com dados fictícios</dd></div>
+    <div><dt>Documento</dt><dd>{{date}}</dd></div>
+  </dl>
+</section>
+
+<!-- ===================================================== SUMÁRIO + 2. VISÃO GERAL -->
+<section class="page">
+  <div class="eyebrow">Sumário</div>
+  <nav class="toc">
+    <a href="#visao-geral"><span class="n">01</span>Visão geral<span class="pg" data-for="visao-geral"></span></a>
+    <a href="#como-funciona"><span class="n">06</span>Como o sistema funciona<span class="pg" data-for="como-funciona"></span></a>
+    <a href="#problema"><span class="n">02</span>O problema<span class="pg" data-for="problema"></span></a>
+    <a href="#publico"><span class="n">07</span>Público-alvo e aplicações<span class="pg" data-for="publico"></span></a>
+    <a href="#valor"><span class="n">03</span>Proposta de valor<span class="pg" data-for="valor"></span></a>
+    <a href="#diferenciais"><span class="n">08</span>Diferenciais e evolução<span class="pg" data-for="diferenciais"></span></a>
+    <a href="#funcionalidades"><span class="n">04</span>Funcionalidades<span class="pg" data-for="funcionalidades"></span></a>
+    <a href="#conclusao"><span class="n">09</span>Conclusão<span class="pg" data-for="conclusao"></span></a>
+    <a href="#tecnologias"><span class="n">05</span>Tecnologias<span class="pg" data-for="tecnologias"></span></a>
+    <a href="#limitacoes"><span class="n">—</span>Escopo e limitações<span class="pg" data-for="limitacoes"></span></a>
+  </nav>
+
+  <div class="section" style="margin-top:12mm">
+    <div class="eyebrow" id="visao-geral">01 — Visão geral</div>
+    <h2>O que é o projeto</h2>
+    <p class="intro">O Dashboard Operacional é um painel de controle no navegador. Ele reúne o estado de uma operação distribuída em quatro seções (visão geral, ativos, alertas e eventos) e destaca o que exige atenção.</p>
+
+    <p>Uma operação fictícia serve de cenário: <strong>40 ativos</strong> (sensores ópticos, térmicos, acústicos e sísmicos; veículos de patrulha, logística e reconhecimento; estações fixas) espalhados em cinco regiões. O painel mostra quantos estão online, a latência média, o volume de eventos recebidos por segundo e os alertas ainda não tratados. O operador pode filtrar, buscar, ordenar e marcar alertas como reconhecidos.</p>
+    <p>Ainda não há servidor nem banco de dados. Os números vêm de um gerador de <strong>dados fictícios realistas</strong> que imita uma API, com tempo de resposta, falhas e respostas vazias. Assim dá para ver todos os estados da interface antes de ligar o painel a uma fonte real.</p>
+
+    <div class="stats">
+      <div class="stat"><div class="label">Seções</div><div class="value">4</div><div class="hint">+ página de endereço inexistente</div></div>
+      <div class="stat"><div class="label">Ativos simulados</div><div class="value">40</div><div class="hint">32 online · 6 degradados · 2 offline</div></div>
+      <div class="stat"><div class="label">Alertas / eventos</div><div class="value">12 / 25</div><div class="hint">3 críticos · 5 avisos · 4 info</div></div>
+      <div class="stat"><div class="label">Testes automatizados</div><div class="value">{{unitTests}}</div><div class="hint">+ {{e2eTests}} testes no navegador real</div></div>
+    </div>
+
+    <h3>Finalidade</h3>
+    <ul class="list ok">
+      <li><strong>Mostrar a situação de uma vez:</strong> indicadores, tendências e pendências na mesma tela.</li>
+      <li><strong>Ajudar a priorizar:</strong> ativos com problema e alertas pendentes aparecem primeiro, com a gravidade codificada em cores.</li>
+      <li><strong>Servir de base para um produto real:</strong> a camada de dados é isolada, então dá para trocar o gerador fictício por uma API sem reescrever a interface.</li>
+    </ul>
+  </div>
+  <footer class="footer"><span class="brand"><span class="dot"></span>Dashboard Operacional</span><span class="pgnum"></span></footer>
+</section>
+
+<!-- ===================================================== VISÃO GERAL — tela -->
+<section class="page">
+  <div class="eyebrow">01 — Visão geral</div>
+  <h2>A tela principal</h2>
+  <p class="intro">A visão geral junta tudo: quatro indicadores no topo, dois gráficos, a tabela de ativos, os alertas recentes e o feed de eventos.</p>
+
+  <figure style="width:84%;margin-left:auto;margin-right:auto">
+    <div class="frame"><img src="{{shot:overview-full}}" alt=""></div>
+    <figcaption><b>Fig. 1</b> Visão geral no desktop, com dados do período de 24 horas.</figcaption>
+  </figure>
+
+  <div class="cards three" style="margin-top:4mm">
+    <div class="card accent"><div class="k">Topo</div><h4>Barra superior</h4><p>Busca global, status do sistema, sino de notificações e menu do operador.</p></div>
+    <div class="card accent"><div class="k">Esquerda</div><h4>Navegação</h4><p>Barra lateral com as quatro seções. No celular, ela vira um menu que abre por cima da tela.</p></div>
+    <div class="card accent"><div class="k">Centro</div><h4>Painéis</h4><p>Cada bloco tem título, conteúdo e estados próprios de carregamento, vazio e erro.</p></div>
+  </div>
+  <footer class="footer"><span class="brand"><span class="dot"></span>Dashboard Operacional</span><span class="pgnum"></span></footer>
+</section>
+
+<!-- ===================================================== 3. PROBLEMA + 4. VALOR -->
+<section class="page">
+  <div class="section">
+    <div class="eyebrow" id="problema">02 — O problema</div>
+    <h2>Muitos ativos, pouca visibilidade</h2>
+    <p class="intro">Uma frota distribuída de equipamentos gera um fluxo constante de medições, falhas e avisos. Sem um ponto central, a equipe de operação perde tempo para entender o que está acontecendo.</p>
+    <div class="cards">
+      <div class="card accent-warn"><h4>Informação espalhada</h4><p>Status, latência, alertas e histórico de eventos ficam em lugares diferentes, e a visão de conjunto se perde.</p></div>
+      <div class="card accent-warn"><h4>Difícil priorizar</h4><p>Quando tudo chega junto, um alerta crítico pode ficar escondido entre avisos de rotina.</p></div>
+      <div class="card accent-warn"><h4>Sem noção de tendência</h4><p>Um número isolado não diz se a situação melhorou ou piorou em relação ao período anterior.</p></div>
+      <div class="card accent-warn"><h4>Pendências sem dono</h4><p>Sem registrar que um alerta foi visto, não fica claro o que ainda precisa de ação.</p></div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:7mm">
+    <div class="eyebrow" id="valor">03 — Proposta de valor</div>
+    <h2>Clareza para decidir rápido</h2>
+    <p class="intro">O painel organiza a operação por urgência e mantém a interface sóbria: as cores existem para sinalizar estado, não para enfeitar.</p>
+    <table>
+      <thead><tr><th style="width:30%">Benefício</th><th>Como o projeto entrega</th></tr></thead>
+      <tbody>
+        <tr><td>Situação em segundos</td><td>Quatro indicadores com a variação em relação ao período anterior, coloridos em verde quando a mudança é boa e em âmbar quando é ruim.</td></tr>
+        <tr><td>Prioridade evidente</td><td>Ativos offline e degradados aparecem no topo da tabela. Alertas pendentes vêm antes dos reconhecidos. Vermelho só para o que é crítico.</td></tr>
+        <tr><td>Ação no próprio painel</td><td>“Reconhecer” um alerta atualiza o contador de pendentes, o sino de notificações e o status geral do sistema.</td></tr>
+        <tr><td>Encontrar qualquer item</td><td>Uma busca única filtra ativos, alertas e eventos, ignorando acentos e maiúsculas (“estacao” encontra “Estação”).</td></tr>
+        <tr><td>Confiável em falhas</td><td>Se uma atualização falhar, os últimos dados continuam na tela, com aviso e botão “Tentar novamente”.</td></tr>
+        <tr><td>Para todos os usuários</td><td>Funciona pelo teclado, anuncia mudanças para leitores de tela, tem contraste verificado e se adapta ao celular.</td></tr>
+        <tr><td>Pronto para crescer</td><td>A origem dos dados é isolada: uma API real pode substituir a simulada sem mudar os painéis.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <footer class="footer"><span class="brand"><span class="dot"></span>Dashboard Operacional</span><span class="pgnum"></span></footer>
+</section>
+
+<!-- ===================================================== 5. FUNCIONALIDADES (1/3) -->
+<section class="page">
+  <div class="eyebrow" id="funcionalidades">04 — Funcionalidades</div>
+  <h2>O que o painel faz</h2>
+  <p class="intro">Todas as funções abaixo estão implementadas e cobertas por testes automatizados.</p>
+
+  <table>
+    <thead><tr><th style="width:24%">Funcionalidade</th><th>O que faz</th><th style="width:16%">Onde</th></tr></thead>
+    <tbody>
+      <tr><td>Indicadores (KPIs)</td><td>Ativos online, alertas pendentes, latência média e ingestão média de eventos por segundo, com a variação percentual em relação ao período anterior.</td><td><span class="pill">Visão geral</span></td></tr>
+      <tr><td>Gráfico de ingestão</td><td>Linha com o volume de eventos ao longo do período, valores ao passar o mouse e resumo com mínimo, média e máximo. Um botão troca o gráfico por uma tabela com os mesmos dados.</td><td><span class="pill">Visão geral</span></td></tr>
+      <tr><td>Alertas por severidade</td><td>Barras com a quantidade de alertas críticos, avisos e informativos do período.</td><td><span class="pill">Visão geral</span></td></tr>
+      <tr><td>Tabela de ativos</td><td>Nome, código, tipo, região, status, latência e último contato. Filtro por status com contagem de cada grupo, ordenação por coluna e filtro guardado no endereço da página, para compartilhar ou continuar em “Ver todos”.</td><td><span class="pill">Visão geral</span> <span class="pill">Ativos</span></td></tr>
+      <tr><td>Lista de alertas</td><td>Pendentes primeiro, do mais recente ao mais antigo, com severidade, ativo de origem e horário. Botão “Reconhecer” em cada alerta pendente.</td><td><span class="pill">Visão geral</span> <span class="pill">Alertas</span></td></tr>
+      <tr><td>Feed de eventos</td><td>Histórico de ocorrências (calibrações, rotas recalculadas, perda de conexão…) com severidade, autor (sistema ou operador) e tempo relativo.</td><td><span class="pill">Visão geral</span> <span class="pill">Eventos</span></td></tr>
+      <tr><td>Filtro de período</td><td>24 horas, 7 dias ou 30 dias. Trocar o período busca novos dados, e uma resposta antiga nunca sobrescreve a mais nova.</td><td><span class="pill">Todas*</span></td></tr>
+      <tr><td>Filtro de severidade</td><td>Todas, Info, Aviso ou Crítico. Vale para as listas de alertas e eventos. “Limpar filtros” aparece quando algo foge do padrão.</td><td><span class="pill">Todas*</span></td></tr>
+      <tr><td>Busca global</td><td>Um campo no topo filtra ativos, alertas e eventos ao mesmo tempo. Aceita várias palavras e ignora acentos. A tecla <code>/</code> foca a busca e <code>Esc</code> limpa.</td><td><span class="pill">Topo</span></td></tr>
+      <tr><td>Notificações</td><td>Sino com o número de alertas pendentes. Abre os cinco mais recentes, que podem ser reconhecidos ali mesmo, e leva à página de alertas.</td><td><span class="pill">Topo</span></td></tr>
+      <tr><td>Status do sistema</td><td>Operacional, Degradado ou Interrompido. Passa para “Operacional” quando não sobra alerta crítico pendente.</td><td><span class="pill">Topo</span></td></tr>
+      <tr><td>Menu do operador</td><td>Mostra o operador e o turno e lista os atalhos de teclado. “Sair” só avisa que é uma demonstração, porque ainda não há login.</td><td><span class="pill">Topo</span></td></tr>
+    </tbody>
+  </table>
+  <p class="small muted" style="margin-top:2.5mm">* A página Ativos não tem barra de filtros, porque a frota é a mesma em qualquer período e ativos não têm severidade. A busca e o filtro de status continuam valendo.</p>
+  <footer class="footer"><span class="brand"><span class="dot"></span>Dashboard Operacional</span><span class="pgnum"></span></footer>
+</section>
+
+<!-- ===================================================== FUNCIONALIDADES (2/3) -->
+<section class="page">
+  <div class="eyebrow">04 — Funcionalidades</div>
+  <h2>Reconhecer alertas e acompanhar pendências</h2>
+  <p class="intro">Reconhecer um alerta significa dizer “já vi, estou cuidando”. Um clique atualiza o painel inteiro de forma coerente.</p>
+
+  <div class="diagram">
+    <div class="title">Efeito de um reconhecimento</div>
+    <div class="flow">
+      <div class="step"><div class="n">AÇÃO</div><div class="t">Operador clica em “Reconhecer”</div><div class="d">Na lista de alertas ou no sino de notificações.</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="n">01</div><div class="t">Alerta vai para o fim da lista</div><div class="d">Aparece esmaecido, com a marca “Reconhecido”.</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="n">02</div><div class="t">KPI de pendentes é recalculado</div><div class="d">Inclusive a variação em relação ao período anterior.</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="n">03</div><div class="t">Sino e status do sistema mudam</div><div class="d">Sem crítico pendente, o sistema volta a “Operacional”.</div></div>
+    </div>
+  </div>
+
+  <div class="shots" style="grid-template-columns:1.6fr 1fr;margin-top:5mm;align-items:start">
+    <figure>
+      <div class="frame"><img src="{{shot:alerts}}" alt=""></div>
+      <figcaption><b>Fig. 2</b> Página de alertas: pendentes no topo, reconhecidos ao final.</figcaption>
+    </figure>
+    <figure>
+      <div class="frame"><img src="{{shot:notifications}}" alt=""></div>
+      <figcaption><b>Fig. 3</b> Notificações: reconhecimento rápido sem sair da tela.</figcaption>
+    </figure>
+  </div>
+
+  <h3>Navegar por qualquer lugar</h3>
+  <ul class="list ok">
+    <li><strong>Endereços próprios:</strong> cada seção tem sua URL, e o filtro de status dos ativos vai junto no link.</li>
+    <li><strong>“Ver todos”:</strong> os painéis resumidos da visão geral levam à lista completa da seção.</li>
+    <li><strong>Teclado:</strong> <code>/</code> abre a busca, <code>Esc</code> fecha menus e limpa a busca, e o foco nunca se perde depois de reconhecer um alerta.</li>
+  </ul>
+  <footer class="footer"><span class="brand"><span class="dot"></span>Dashboard Operacional</span><span class="pgnum"></span></footer>
+</section>
+
+<!-- ===================================================== FUNCIONALIDADES — celular -->
+<section class="page">
+  <div class="eyebrow">04 — Funcionalidades</div>
+  <h2>No celular</h2>
+  <p class="intro">O layout se reorganiza para telas pequenas. Testes no navegador real conferem as larguras de 360, 768 e 1440 pixels.</p>
+
+  <div class="shots" style="grid-template-columns:62mm 62mm;justify-content:center;gap:10mm">
+    <figure>
+      <div class="frame"><img src="{{shot:mobile}}" alt=""></div>
+      <figcaption><b>Fig. 4</b> Visão geral a 390 px.</figcaption>
+    </figure>
+    <figure>
+      <div class="frame"><img src="{{shot:mobile-menu}}" alt=""></div>
+      <figcaption><b>Fig. 5</b> Menu de navegação aberto.</figcaption>
+    </figure>
+  </div>
+
+  <h3>O que muda em telas pequenas</h3>
+  <div class="two-col" style="gap:6mm">
+    <ul class="list ok">
+      <li>A barra lateral vira um menu que abre pelo ícone ☰ e fecha com <code>Esc</code>, devolvendo o foco ao botão.</li>
+      <li>Indicadores e painéis ficam empilhados em uma coluna.</li>
+      <li>Os rótulos dos eixos do gráfico nunca ficam cortados.</li>
+    </ul>
+    <ul class="list ok">
+      <li>A tabela de ativos rola dentro do próprio painel, sem empurrar a página para os lados.</li>
+      <li>O status do sistema fica só com o ponto colorido. O rótulo continua disponível para leitores de tela.</li>
+    </ul>
+  </div>
+  <footer class="footer"><span class="brand"><span class="dot"></span>Dashboard Operacional</span><span class="pgnum"></span></footer>
+</section>
+
+<!-- ===================================================== FUNCIONALIDADES (3/3) -->
+<section class="page">
+  <div class="eyebrow">04 — Funcionalidades</div>
+  <h2>Estados da interface</h2>
+  <p class="intro">Um painel profissional precisa se comportar bem quando os dados demoram, não existem ou falham. Cada situação tem uma resposta visual própria.</p>
+
+  <div class="staterows">
+    <figure class="staterow">
+      <div class="frame"><img src="{{shot:loading}}" alt=""></div>
+      <figcaption><div><b>Carregando</b><p>Na primeira carga, blocos cinza ocupam o lugar dos dados. Leitores de tela ouvem “Carregando dados…” uma vez por página. Ao trocar de período, o conteúdo anterior fica na tela, esmaecido, até chegar o novo, e a tela não “pisca”.</p></div></figcaption>
+    </figure>
+    <figure class="staterow">
+      <div class="frame"><img src="{{shot:empty}}" alt=""></div>
+      <figcaption><div><b>Vazio</b><p>Cada painel explica o que falta (“Nenhum ativo cadastrado.”, “Sem dados de ingestão no período.”). Uma busca sem resultado também mostra mensagem, não erro.</p></div></figcaption>
+    </figure>
+    <figure class="staterow">
+      <div class="frame"><img src="{{shot:error}}" alt=""></div>
+      <figcaption><div><b>Erro</b><p>Um aviso único no topo explica o problema e oferece “Tentar novamente”. Se já havia dados, eles continuam visíveis e marcados como desatualizados. Se só o gráfico falhar, apenas o painel dele mostra o erro.</p></div></figcaption>
+    </figure>
+  </div>
+  <p class="small muted" style="margin-top:3mm">Um endereço inexistente leva à página “Página não encontrada”, com link de volta para a visão geral.</p>
+
+  <div class="callout ok"><strong>Demonstração embutida.</strong> Basta acrescentar <code>?simular=erro</code>, <code>?simular=vazio</code> ou <code>?simular=lento</code> ao endereço para forçar cada estado. Foi assim que as capturas desta página foram geradas.</div>
+  <footer class="footer"><span class="brand"><span class="dot"></span>Dashboard Operacional</span><span class="pgnum"></span></footer>
+</section>
+
+<!-- ===================================================== 6. TECNOLOGIAS -->
+<section class="page">
+  <div class="eyebrow" id="tecnologias">05 — Tecnologias</div>
+  <h2>Ferramentas utilizadas</h2>
+  <p class="intro">O projeto usa ferramentas modernas e bem estabelecidas do ecossistema web, escolhidas para manter o código seguro, rápido e fácil de evoluir.</p>
+
+  <table class="compact">
+    <thead><tr><th style="width:26%">Ferramenta</th><th style="width:17%">Papel</th><th>Por que importa</th></tr></thead>
+    <tbody>
+      <tr><td>React 19</td><td>Interface</td><td>Monta a tela a partir de componentes reutilizáveis (painel, cartão, tabela).</td></tr>
+      <tr><td>TypeScript 6</td><td>Linguagem</td><td>Acrescenta tipos ao JavaScript e pega erros antes de o código rodar.</td></tr>
+      <tr><td>Vite 8</td><td>Build</td><td>Servidor local instantâneo e pacote final otimizado para produção.</td></tr>
+      <tr><td>Tailwind CSS 4</td><td>Estilos</td><td>Estilos consistentes a partir de tokens de cor, espaçamento e tipografia.</td></tr>
+      <tr><td>shadcn/ui + Radix</td><td>Componentes base</td><td>Menus, seletores, abas e painéis laterais acessíveis, adaptados ao tema escuro.</td></tr>
+      <tr><td>Recharts 3</td><td>Gráficos</td><td>Gráficos de linha e barras. Carregado só quando necessário, para abrir a página mais rápido.</td></tr>
+      <tr><td>React Router 8</td><td>Navegação</td><td>Endereços próprios para cada seção (<code>/ativos</code>, <code>/alertas</code>…) e filtros na URL.</td></tr>
+      <tr><td>lucide-react · sonner</td><td>Ícones e avisos</td><td>Ícones de traço fino e mensagens temporárias (toasts).</td></tr>
+      <tr><td>Inter · JetBrains Mono</td><td>Tipografia</td><td>Inter nos textos e monoespaçada em números e horários, sem depender de serviços externos.</td></tr>
+      <tr><td>Vitest + Testing Library</td><td>Testes</td><td>Simulam o uso real: cliques, teclado, estados de carga e erro.</td></tr>
+      <tr><td>vitest-axe</td><td>Acessibilidade</td><td>Análise automática de acessibilidade em todas as páginas e estados.</td></tr>
+      <tr><td>Playwright</td><td>Testes E2E</td><td>Confere layout, rolagem e foco num Chromium real, em três larguras de tela.</td></tr>
+      <tr><td>oxlint</td><td>Lint</td><td>Análise estática rápida, com regras de React e de acessibilidade.</td></tr>
+      <tr><td>Node.js 22 · npm</td><td>Ambiente</td><td>Versão fixada no projeto (<code>.nvmrc</code>) para todos usarem o mesmo ambiente.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Qualidade verificada</h3>
+  <div class="stats">
+    <div class="stat"><div class="label">Testes unitários</div><div class="value">{{unitTests}}</div><div class="hint">em {{unitFiles}} arquivos</div></div>
+    <div class="stat"><div class="label">Testes no navegador</div><div class="value">{{e2eTests}}</div><div class="hint">cenários × larguras de tela</div></div>
+    <div class="stat"><div class="label">Contraste mínimo</div><div class="value">4,5:1</div><div class="hint">padrão WCAG AA, testado</div></div>
+    <div class="stat"><div class="label">Histórico</div><div class="value">{{commits}}</div><div class="hint">commits pequenos e descritivos</div></div>
+  </div>
+  <footer class="footer"><span class="brand"><span class="dot"></span>Dashboard Operacional</span><span class="pgnum"></span></footer>
+</section>
+
+<!-- ===================================================== 7. COMO FUNCIONA (1/2) -->
+<section class="page">
+  <div class="eyebrow" id="como-funciona">06 — Como o sistema funciona</div>
+  <h2>Arquitetura em camadas</h2>
+  <p class="intro">A aplicação roda inteira no navegador. As camadas externas guardam o estado compartilhado e as internas apenas o exibem.</p>
+
+  <div class="diagram">
+    <div class="title">Estrutura da aplicação, de fora para dentro</div>
+    <div class="layer">
+      <div class="lh">Navegação <span class="mono">BrowserRouter</span></div>
+      <div class="ld">Liga cada endereço (<code>/</code>, <code>/ativos</code>, <code>/alertas</code>, <code>/eventos</code>) à sua página.</div>
+      <div class="layer l2">
+        <div class="lh">Filtros <span class="mono">FiltersProvider</span></div>
+        <div class="ld">Guarda o período, a severidade e o texto da busca, compartilhados por todas as páginas.</div>
+        <div class="layer l3">
+          <div class="lh">Dados <span class="mono">DashboardDataProvider</span></div>
+          <div class="ld">Busca os dados do período escolhido, controla carga e erro e aplica os reconhecimentos de alertas da sessão.</div>
+          <div class="layer dark">
+            <div class="lh">Moldura da aplicação <span class="mono">AppShell</span></div>
+            <div class="ld">Barra lateral (ou menu móvel) + barra superior + área de conteúdo.</div>
+            <div class="row">
+              <div class="chip">Visão geral<span class="mono">OverviewPage</span></div>
+              <div class="chip">Ativos<span class="mono">AssetsPage</span></div>
+              <div class="chip">Alertas<span class="mono">AlertsPage</span></div>
+              <div class="chip">Eventos<span class="mono">EventsPage</span></div>
+            </div>
+            <div class="row">
+              <div class="chip">Painel<span class="mono">Panel · estados</span></div>
+              <div class="chip">Indicadores<span class="mono">KpiGrid · KpiCard</span></div>
+              <div class="chip">Gráficos<span class="mono">charts/</span></div>
+              <div class="chip">Tabela e listas<span class="mono">AssetsTable · AlertsPanel…</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Organização do código</h3>
+  <table class="compact">
+    <thead><tr><th style="width:26%">Pasta</th><th>Responsabilidade</th></tr></thead>
+    <tbody>
+      <tr><td><code>src/pages</code></td><td>As seções navegáveis. Cada página só monta painéis.</td></tr>
+      <tr><td><code>src/components</code></td><td>Peças visuais: moldura (<code>layout</code>), painéis (<code>dashboard</code>), gráficos (<code>charts</code>) e componentes base (<code>ui</code>).</td></tr>
+      <tr><td><code>src/hooks</code></td><td>Lógica de estado compartilhado: filtros, carga de dados e cancelamento de pedidos antigos.</td></tr>
+      <tr><td><code>src/data</code></td><td>API simulada e gerador de dados fictícios. É o único ponto a trocar para usar uma API real.</td></tr>
+      <tr><td><code>src/lib</code></td><td>Regras puras: formatação em pt-BR, busca sem acentos, ordenação, rótulos e cores de severidade.</td></tr>
+      <tr><td><code>src/types</code></td><td>Contrato dos dados: ativo, alerta, evento, indicador e ponto do gráfico.</td></tr>
+    </tbody>
+  </table>
+  <footer class="footer"><span class="brand"><span class="dot"></span>Dashboard Operacional</span><span class="pgnum"></span></footer>
+</section>
+
+<!-- ===================================================== 7. COMO FUNCIONA (2/2) -->
+<section class="page">
+  <div class="eyebrow">06 — Como o sistema funciona</div>
+  <h2>O caminho dos dados</h2>
+  <p class="intro">Toda a tela depende de um único pacote de dados por período. A ordem abaixo explica o que acontece desde a escolha de um filtro até a atualização dos painéis.</p>
+
+  <div class="diagram">
+    <div class="title">Fluxo de uma atualização</div>
+    <div class="flow">
+      <div class="step"><div class="n">01 · FILTRO</div><div class="t">Usuário escolhe o período</div><div class="d">24 h, 7 dias ou 30 dias.</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="n">02 · PEDIDO</div><div class="t">Provedor de dados pede à API</div><div class="d">Um pedido ainda em andamento é cancelado.</div></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="n">03 · API SIMULADA</div><div class="t">Gera os dados fictícios</div><div class="d">Após ~0,4 s, ou 2 s no modo lento. Pode falhar ou vir vazia sob demanda.</div></div>
+    </div>
+    <div class="flow vertical"><div class="arrow" style="justify-content:flex-end;padding-right:24mm">↓</div></div>
+    <div class="flow">
+      <div class="step"><div class="n">06 · TELA</div><div class="t">Busca e severidade filtram as listas</div><div class="d">Na própria tela, sem novo pedido.</div></div>
+      <div class="arrow">←</div>
+      <div class="step"><div class="n">05 · PAINÉIS</div><div class="t">Cada painel decide seu estado</div><div class="d">Carregando, com dados, vazio, erro ou recarregando.</div></div>
+      <div class="arrow">←</div>
+      <div class="step"><div class="n">04 · SESSÃO</div><div class="t">Reconhecimentos são aplicados</div><div class="d">Alertas, KPI de pendentes e status do sistema ficam coerentes.</div></div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-top:6mm">
+    <div>
+      <h3 style="margin-top:0">Dados fictícios, mas realistas</h3>
+      <p>O gerador usa um <strong>sorteio com semente fixa</strong> e uma <strong>data de referência fixa</strong> (16/10/2026, 12h UTC). A mesma tela aparece toda vez, o que facilita testes, demonstrações e comparações.</p>
+      <p>Os números seguem proporções plausíveis: 80% dos ativos online, 15% degradados e 5% offline, latências maiores nos ativos com problema e uma curva de ingestão que varia ao longo do dia.</p>
+    </div>
+    <div>
+      <h3 style="margin-top:0">Robustez embutida</h3>
+      <ul class="list ok">
+        <li>Uma resposta atrasada nunca sobrescreve a mais recente.</li>
+        <li>Valores inválidos (<code>NaN</code>, infinito) aparecem como “—”, nunca como texto quebrado.</li>
+        <li>Números e datas seguem o padrão brasileiro (<span class="mono">1.199 ev/s</span>, “há 5 h”).</li>
+        <li>Os gráficos carregam à parte. Se falharem, só o painel deles é afetado.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Estados de um painel</h3>
+  <div class="states">
+    <div class="state"><div class="sh"><span class="dot" style="background:#8b8b94"></span>Carregando</div><div class="sd">Sem dados ainda: blocos de espera.</div><div class="skel" style="width:80%"></div><div class="skel" style="width:60%"></div></div>
+    <div class="state"><div class="sh"><span class="dot"></span>Com dados</div><div class="sd">Conteúdo normal, interativo.</div></div>
+    <div class="state"><div class="sh"><span class="dot" style="background:#8b8b94"></span>Vazio</div><div class="sd">Pedido bem-sucedido, mas sem itens: mensagem explicativa.</div></div>
+    <div class="state"><div class="sh"><span class="dot"></span>Recarregando</div><div class="sd">Dados anteriores visíveis e esmaecidos enquanto chega o novo período.</div></div>
+    <div class="state"><div class="sh"><span class="dot warn"></span>Desatualizado</div><div class="sd">A recarga falhou, mas os dados anteriores continuam visíveis.</div></div>
+    <div class="state"><div class="sh"><span class="dot warn"></span>Erro</div><div class="sd">Nada para mostrar: “Dados indisponíveis” e aviso com nova tentativa.</div></div>
+  </div>
+  <footer class="footer"><span class="brand"><span class="dot"></span>Dashboard Operacional</span><span class="pgnum"></span></footer>
+</section>
+
+<!-- ===================================================== 8. PÚBLICO-ALVO -->
+<section class="page">
+  <div class="eyebrow" id="publico">07 — Público-alvo e aplicações</div>
+  <h2>Para quem é</h2>
+  <p class="intro">O painel foi pensado para quem acompanha uma operação em turnos e precisa reagir rápido. O menu de perfil identifica o usuário como “Operador · Turno A”.</p>
+
+  <div class="cards three">
+    <div class="card accent"><div class="k">Usuário principal</div><h4>Operadores de turno</h4><p>Acompanham a frota, reconhecem alertas e investigam eventos durante o expediente.</p></div>
+    <div class="card accent"><div class="k">Gestão</div><h4>Supervisores</h4><p>Usam os indicadores e as tendências para avaliar a saúde geral e comparar períodos.</p></div>
+    <div class="card accent"><div class="k">Técnico</div><h4>Equipes de desenvolvimento</h4><p>Partem desta base para construir um painel real, ou a usam como referência de boas práticas.</p></div>
+  </div>
+
+  <h3>Possíveis aplicações</h3>
+  <p class="muted">O modelo de dados (ativos com tipo, região, status e latência; alertas com severidade; eventos com autor) é genérico o suficiente para vários domínios. Os exemplos abaixo são aplicações possíveis, ainda não implementadas.</p>
+  <table>
+    <thead><tr><th style="width:28%">Área</th><th>Exemplo de uso</th></tr></thead>
+    <tbody>
+      <tr><td>Redes de sensores (IoT)</td><td>Monitorar sensores ambientais, industriais ou sísmicos, com queda de sinal, bateria e temperatura.</td></tr>
+      <tr><td>Frotas e logística</td><td>Acompanhar veículos por região, com latência de comunicação e rotas recalculadas.</td></tr>
+      <tr><td>Segurança e vigilância</td><td>Centros de controle com sensores ópticos e acústicos e veículos de patrulha, como no cenário simulado.</td></tr>
+      <tr><td>Infraestrutura de TI</td><td>Servidores e serviços no lugar dos ativos, com ingestão de eventos e alertas de disponibilidade.</td></tr>
+      <tr><td>Utilidades e energia</td><td>Estações remotas com falha de energia, telemetria e manutenção programada.</td></tr>
+      <tr><td>Ensino</td><td>Material de estudo de React, TypeScript, testes e acessibilidade num projeto completo e coerente.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout"><strong>Identidade visual.</strong> O tema escuro, a tipografia técnica e os acentos em verde e âmbar seguem a especificação do projeto, inspirada em softwares operacionais de alto nível, sem copiar marcas ou layouts. O visual sóbrio reduz o cansaço em turnos longos e deixa as cores livres para sinalizar estado.</div>
+  <footer class="footer"><span class="brand"><span class="dot"></span>Dashboard Operacional</span><span class="pgnum"></span></footer>
+</section>
+
+<!-- ===================================================== 9. DIFERENCIAIS + EVOLUÇÃO -->
+<section class="page">
+  <div class="eyebrow" id="diferenciais">08 — Diferenciais e evolução</div>
+  <h2>O que distingue o projeto</h2>
+
+  <div class="cards">
+    <div class="card dark"><h4><span class="dot"></span>Acessibilidade de verdade</h4><p>Análise automática em todas as páginas e estados, contraste testado, uso completo pelo teclado, foco que não se perde ao reconhecer alertas e gráfico com versão em tabela.</p></div>
+    <div class="card dark"><h4><span class="dot"></span>Coerência dos dados</h4><p>Reconhecer um alerta recalcula indicador, contador e status do sistema. Tabela, gráfico e listas nunca se contradizem.</p></div>
+    <div class="card dark"><h4><span class="dot"></span>Pensado para falhas</h4><p>Seis estados de painel tratados, simulação de erro, vazio e lentidão pela URL e dados preservados quando uma atualização falha.</p></div>
+    <div class="card dark"><h4><span class="dot"></span>Base sólida para crescer</h4><p>Origem dos dados isolada, tipos compartilhados, componentes reutilizáveis e mais de {{unitTestsRounded}} testes protegendo cada mudança.</p></div>
+  </div>
+
+  <h3>Possibilidades de evolução</h3>
+  <p class="muted">Próximos passos naturais, a partir de limites que o próprio código deixa visíveis:</p>
+  <table>
+    <thead><tr><th style="width:30%">Evolução</th><th>Situação atual → próximo passo</th><th style="width:13%">Esforço</th></tr></thead>
+    <tbody>
+      <tr><td>Conectar a uma API real</td><td>Os dados vêm de um gerador fictício. O provedor já aceita outra fonte de dados, então basta implementar o acesso ao serviço.</td><td><span class="pill">Médio</span></td></tr>
+      <tr><td>Login e perfis</td><td>“Sair” é apenas demonstrativo e o operador é fixo. Falta adicionar autenticação e permissões.</td><td><span class="pill">Alto</span></td></tr>
+      <tr><td>Reconhecimentos persistentes</td><td>Hoje valem só durante a sessão. Falta gravá-los no servidor, com autor e horário.</td><td><span class="pill">Médio</span></td></tr>
+      <tr><td>Atualização ao vivo</td><td>Os dados mudam ao trocar o período. Daria para receber novidades automaticamente, por consulta periódica ou conexão contínua.</td><td><span class="pill">Médio</span></td></tr>
+      <tr><td>Detalhe de cada ativo</td><td>A tabela mostra o resumo. Uma página por ativo reuniria histórico, alertas e eventos.</td><td><span class="pill">Médio</span></td></tr>
+      <tr><td>Mapa por região</td><td>Os ativos têm região, mas não coordenadas. Um mapa daria a visão geográfica da frota.</td><td><span class="pill">Alto</span></td></tr>
+      <tr><td>Exportação e relatórios</td><td>Exportar tabelas e indicadores para planilha ou PDF.</td><td><span class="pill">Baixo</span></td></tr>
+      <tr><td>Filtros na URL</td><td>Só o status dos ativos vai para o endereço. Período, severidade e busca também poderiam ir, para compartilhar uma visão exata.</td><td><span class="pill">Baixo</span></td></tr>
+    </tbody>
+  </table>
+  <footer class="footer"><span class="brand"><span class="dot"></span>Dashboard Operacional</span><span class="pgnum"></span></footer>
+</section>
+
+<!-- ===================================================== 10. CONCLUSÃO -->
+<section class="page">
+  <div class="eyebrow" id="conclusao">09 — Conclusão</div>
+  <h2>Uma base pronta para a operação real</h2>
+  <p class="intro">O Dashboard Operacional mostra que um painel denso de informação pode ser, ao mesmo tempo, claro, acessível e confiável.</p>
+
+  <p>Em uma tela, o operador vê como está a frota, o que mudou em relação ao período anterior e o que precisa de ação. A interface trata com o mesmo cuidado o caminho feliz e as situações difíceis (lentidão, falha, ausência de dados), e todo o comportamento é protegido por testes automatizados.</p>
+  <p>O principal passo que falta é conectar uma fonte de dados real. A arquitetura foi preparada para isso: a origem dos dados é uma peça isolada e o resto da aplicação não precisa saber de onde as informações vêm.</p>
+
+  <div class="cards three" style="margin-top:4mm">
+    <div class="card accent"><div class="k">Para o usuário</div><h4>Decidir mais rápido</h4><p>Prioridades evidentes, ações no próprio painel e leitura confortável em turnos longos.</p></div>
+    <div class="card accent"><div class="k">Para o negócio</div><h4>Menos risco</h4><p>Alertas críticos não se perdem, e falhas de comunicação não deixam a tela em branco.</p></div>
+    <div class="card accent"><div class="k">Para a equipe</div><h4>Evolução segura</h4><p>Código organizado, tipado e testado, com regras de projeto documentadas.</p></div>
+  </div>
+
+  <div class="section" style="margin-top:11mm">
+    <div class="eyebrow" id="limitacoes">Escopo e limitações</div>
+    <h3 style="margin-top:2mm">O que este documento não cobre, e por quê</h3>
+    <ul class="list warn">
+      <li><strong>Sem dados reais:</strong> todos os números, nomes e operadores são fictícios, gerados pelo próprio app. O documento não traz métricas de uso ou de desempenho em produção.</li>
+      <li><strong>Sem servidor, login ou publicação:</strong> o repositório contém só a aplicação no navegador. Não há instruções de implantação, ambiente de produção ou integração com sistemas externos.</li>
+      <li><strong>Público e problema inferidos:</strong> não há documento de requisitos de negócio. O problema e o público foram deduzidos da especificação de design, do cenário simulado e da interface. As aplicações listadas são possibilidades.</li>
+      <li><strong>Versão e documentação:</strong> o projeto está na versão <code>0.0.0</code>, sem README, notas de lançamento ou licença. Este documento foi escrito a partir do código, dos testes e de <code>docs/design.md</code> e <code>docs/plano.md</code>.</li>
+    </ul>
+  </div>
+
+  <div class="spacer"></div>
+  <div class="card dark" style="display:flex;justify-content:space-between;align-items:center">
+    <div class="logo" style="color:#e4e4e7">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3ddc84" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 20v-4M10 20v-8M15 20v-12M20 20V4"/></svg>
+      <span>Dashboard<br>Operacional</span>
+    </div>
+    <div class="mono" style="font-size:7.5pt;color:#8b8b94;text-align:right">Gerado a partir do código-fonte em {{date}}<br>{{unitTests}} testes de unidade · {{e2eTests}} no navegador</div>
+  </div>
+  <footer class="footer"><span class="brand"><span class="dot"></span>Dashboard Operacional</span><span class="pgnum"></span></footer>
+</section>
+
+</body>
+</html>
