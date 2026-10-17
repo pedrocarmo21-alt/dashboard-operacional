@@ -6,16 +6,11 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useDashboardData } from '@/hooks/dashboard-data'
 import { formatRelativeTime } from '@/lib/format'
 import { SEVERITY_LABEL } from '@/lib/labels'
+import { SEVERITY_BG } from '@/lib/severity'
 import { cn } from '@/lib/utils'
-import type { Alert, Severity } from '@/types/dashboard'
+import type { Alert } from '@/types/dashboard'
 
 const VISIBLE = 5
-
-const SEVERITY_DOT: Record<Severity, string> = {
-  info: 'bg-muted-foreground',
-  warning: 'bg-signal-warn',
-  critical: 'bg-signal-critical',
-}
 
 function triggerLabel(pending: number | undefined): string {
   if (pending === undefined) return 'Notificações'
@@ -99,7 +94,7 @@ function NotificationItem({
 }) {
   return (
     <li className="flex items-start gap-2.5 px-3 py-2.5">
-      <span aria-hidden="true" className={cn('mt-1.5 size-1.5 shrink-0 rounded-full', SEVERITY_DOT[alert.severity])} />
+      <span aria-hidden="true" className={cn('mt-1.5 size-1.5 shrink-0 rounded-full', SEVERITY_BG[alert.severity])} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm">
           <span className="sr-only">{SEVERITY_LABEL[alert.severity]}: </span>

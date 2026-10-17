@@ -2,6 +2,7 @@ import { useId } from 'react'
 import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, Tooltip, type TooltipContentProps, XAxis, YAxis } from 'recharts'
 import { useFilters } from '@/hooks/filters'
 import { SEVERITY_LABEL } from '@/lib/labels'
+import { SEVERITY_BG } from '@/lib/severity'
 import { cn } from '@/lib/utils'
 import type { Alert, Severity } from '@/types/dashboard'
 import { countBySeverity } from './chart-data'
@@ -13,12 +14,6 @@ const FILL: Record<Severity, string> = {
   critical: 'var(--signal-critical)',
   warning: 'var(--signal-warn)',
   info: 'var(--chart-4)',
-}
-
-const SWATCH: Record<Severity, string> = {
-  critical: 'bg-signal-critical',
-  warning: 'bg-signal-warn',
-  info: 'bg-chart-4',
 }
 
 interface Row {
@@ -105,7 +100,7 @@ export function IncidentsBySeverityChart({ alerts }: { alerts: Alert[] }) {
               'aria-pressed:border-ring aria-pressed:text-foreground',
             )}
           >
-            <span aria-hidden="true" className={cn('size-2 rounded-[2px]', SWATCH[row.severity])} />
+            <span aria-hidden="true" className={cn('size-2 rounded-[2px]', SEVERITY_BG[row.severity])} />
             {row.label}
             <span className="font-mono text-foreground">{row.count}</span>
           </button>
