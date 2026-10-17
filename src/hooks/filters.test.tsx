@@ -28,6 +28,25 @@ describe('useFilters', () => {
     expect(result.current.query).toBe('norte')
   })
 
+  it('resetFilters volta aos padrões', () => {
+    const { result } = renderHook(() => useFilters(), { wrapper })
+    act(() => {
+      result.current.setPeriod('30d')
+      result.current.setSeverity('warning')
+      result.current.setQuery('sul')
+    })
+    expect(result.current.isDefault).toBe(false)
+    act(() => result.current.resetFilters())
+    expect(result.current).toMatchObject({ period: '24h', severity: 'all', query: '', isDefault: true })
+  })
+
+  it('isDefault só é verdadeiro com todos os filtros no padrão', () => {
+    const { result } = renderHook(() => useFilters(), { wrapper })
+    expect(result.current.isDefault).toBe(true)
+    act(() => result.current.setQuery('x'))
+    expect(result.current.isDefault).toBe(false)
+  })
+
   it('fora do provider lança erro explicativo', () => {
     expect(() => renderHook(() => useFilters())).toThrow('useFilters precisa estar dentro de <FiltersProvider>')
   })

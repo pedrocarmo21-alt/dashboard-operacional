@@ -345,7 +345,7 @@ A cada execução, `useAsync` cria um `AbortController` dentro de um `useEffect(
 **Interfaces:**
 - Consome: `useAsync`, `fetchDashboard`, `getSimulationMode`
 - Produz:
-  - `FiltersProvider({ children })` e `useFilters(): { period: Period; setPeriod(p: Period): void; severity: Severity | 'all'; setSeverity(s: Severity | 'all'): void; query: string; setQuery(q: string): void }`. Padrões: `'24h'`, `'all'` e `''`.
+  - `FiltersProvider({ children })` e `useFilters(): { period: Period; setPeriod(p: Period): void; severity: Severity | 'all'; setSeverity(s: Severity | 'all'): void; query: string; setQuery(q: string): void; isDefault: boolean; resetFilters(): void }`. Padrões: `'24h'`, `'all'` e `''`. `isDefault` e `resetFilters` entraram na Tarefa 8, para o "Limpar filtros".
   - `type Fetcher = (period: Period, signal: AbortSignal) => Promise<DashboardData>`
   - `DashboardDataProvider({ children, fetcher? })`. Sem `fetcher`, usa `fetchDashboard` com `getSimulationMode(window.location.search)`.
   - `useDashboardData(): { status: 'loading' | 'success' | 'error'; data: DashboardData | undefined; error: Error | undefined; retry(): void; acknowledgeAlert(id: string): void }`. Os alertas em `data` já vêm com os reconhecimentos locais aplicados.
@@ -515,7 +515,7 @@ it('botão "Limpar filtros" aparece só com filtro ativo e restaura os padrões'
 ```
 
 - [ ] **Passo 2: Rodar e ver falhar** → FAIL
-- [ ] **Passo 3: Implementar** com `ToggleGroup type="single"` (rótulos curtos visíveis `24h`/`7d`/`30d`, `aria-label` com o `PERIOD_LABEL`) e `Select` (Todas / Info / Aviso / Crítico).
+- [ ] **Passo 3: Implementar** com `ToggleGroup type="single"` (raiz `radiogroup` nomeada "Período"; clicar no item ativo não o desmarca) (rótulos curtos visíveis `24h`/`7d`/`30d`, `aria-label` com o `PERIOD_LABEL`) e `Select` (Todas / Info / Aviso / Crítico).
 - [ ] **Passo 4: Rodar e ver passar** → PASS
 - [ ] **Passo 5: Commit** — `feat: adiciona barra de filtros de período e severidade`
 
