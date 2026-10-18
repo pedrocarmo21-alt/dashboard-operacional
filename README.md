@@ -93,3 +93,7 @@ Para ligar o painel a uma API real, troque a origem dos dados em `src/data/api.t
 - [`docs/design.md`](docs/design.md): especificação de design
 - [`docs/plano.md`](docs/plano.md): plano de implementação e restrições globais
 - [`CLAUDE.md`](CLAUDE.md): regras do projeto (testes, commits, idioma)
+
+## Licença
+
+Distribuído sob a licença MIT. Veja [`LICENSE`](LICENSE).
